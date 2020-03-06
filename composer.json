@@ -2,8 +2,8 @@
   "name": "jeyroik/extas-conditions",
   "description": "Extas conditions package",
   "require": {
-    "jeyroik/extas-base": "*",
-    "jeyroik/extas-installer": "*"
+    "jeyroik/extas-base": "1.*",
+    "jeyroik/extas-installer": "1.*"
   },
   "autoload": {
     "psr-4": {
