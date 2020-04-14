@@ -74,7 +74,7 @@ class ConditionsTest extends TestCase
 
     public function tearDown(): void
     {
-        $this->condRepo->delete([Condition::FIELD__NAME => 'test']);
+        $this->condRepo->delete([Condition::FIELD__TITLE => 'test']);
         $this->pluginRepo->delete([Plugin::FIELD__CLASS => PluginFieldSelfAlias::class]);
     }
 
@@ -791,7 +791,8 @@ class ConditionsTest extends TestCase
         $this->condRepo->create(new Condition([
             Condition::FIELD__NAME => $name,
             Condition::FIELD__ALIASES => $aliases,
-            Condition::FIELD__CLASS => $class
+            Condition::FIELD__CLASS => $class,
+            Condition::FIELD__TITLE => 'test'
         ]));
     }
 }
