@@ -3,7 +3,8 @@
   "description": "Extas conditions package",
   "require": {
     "jeyroik/extas-installer": "2.*",
-    "jeyroik/extas-repositories-fields-aliases": "0.*"
+    "jeyroik/extas-repositories-fields-aliases": "0.*",
+    "jeyroik/extas-samples": "1.*"
   },
   "require-dev": {
     "phpunit/phpunit": "^9",
