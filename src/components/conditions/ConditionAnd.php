@@ -34,7 +34,7 @@ class ConditionAnd extends Plugin implements IConditionDispatcher
 
             return (bool) $result;
         } else {
-            throw new \Exception('Need array as argument in the AND condition');
+            throw new \Exception('Need array as argument in a condition');
         }
     }
 

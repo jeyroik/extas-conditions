@@ -74,6 +74,17 @@ class ConditionsTest extends TestCase
         $this->pluginRepo->delete([Plugin::FIELD__CLASS => PluginFieldSelfAlias::class]);
     }
 
+    public function testUnknownCondition()
+    {
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 'es',
+            ConditionParameter::FIELD__CONDITION => 'unknown'
+        ]);
+
+        $this->expectExceptionMessage('Unknown condition "unknown"');
+        $hasCondition->isConditionTrue('test');
+    }
+
     public function testLike()
     {
         $hasCondition = new ConditionParameter ([
@@ -176,6 +187,10 @@ class ConditionsTest extends TestCase
 
         $hasCondition->setConditionName('and');
         $this->assertTrue($hasCondition->isConditionTrue(8));
+
+        $hasCondition->setValue('not array');
+        $this->expectExceptionMessage('Need array as argument in a condition');
+        $hasCondition->isConditionTrue(8);
     }
 
     public function testOr()
@@ -204,6 +219,10 @@ class ConditionsTest extends TestCase
 
         $hasCondition->setConditionName('or');
         $this->assertTrue($hasCondition->isConditionTrue(8));
+
+        $hasCondition->setValue('not array');
+        $this->expectExceptionMessage('Need array as argument in a condition');
+        $hasCondition->isConditionTrue(8);
     }
 
     public function testIn()
