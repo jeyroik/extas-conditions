@@ -205,17 +205,45 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('and', ['&', '&&'], ConditionIn::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('test'));
-        $this->assertTrue($hasCondition->isConditionTrue(5));
-        $this->assertTrue($hasCondition->isConditionTrue(['test']));
-        $this->assertTrue($hasCondition->isConditionTrue([5, 'test']));
-        $this->assertFalse($hasCondition->isConditionTrue(7));
+        $this->assertTrue($hasCondition->isConditionTrue('6'));
+        $this->assertTrue($hasCondition->isConditionTrue(7));
+        $this->assertFalse($hasCondition->isConditionTrue(5));
 
-        $hasCondition->setValue('test');
-        $this->assertTrue($hasCondition->isConditionTrue('test'));
+        $hasCondition->setConditionName('and');
+        $this->assertTrue($hasCondition->isConditionTrue(8));
+    }
 
-        $hasCondition->setConditionName('in');
-        $this->assertTrue($hasCondition->isConditionTrue('test'));
+    public function testOr()
+    {
+        $hasCondition = new class ([
+            IHasValue::FIELD__VALUE => [
+                [
+                    'value' => 5,
+                    'condition' => '>'
+                ],
+                [
+                    'value' => 10,
+                    'condition' => '<'
+                ]
+            ],
+            IHasCondition::FIELD__CONDITION => '||'
+        ]) extends Item implements IHasCondition {
+            use THasCondition;
+            use THasValue;
+            protected function getSubjectForExtension(): string
+            {
+                return '';
+            }
+        };
+
+        $this->installCondition('or', ['|', '||'], ConditionIn::class);
+
+        $this->assertTrue($hasCondition->isConditionTrue('6'));
+        $this->assertTrue($hasCondition->isConditionTrue(4));
+        $this->assertTrue($hasCondition->isConditionTrue(11));
+
+        $hasCondition->setConditionName('or');
+        $this->assertTrue($hasCondition->isConditionTrue(8));
     }
 
     public function testIn()
