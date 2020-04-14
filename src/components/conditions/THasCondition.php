@@ -35,7 +35,7 @@ trait THasCondition
          */
         $repo = SystemContainer::getItem(IConditionRepository::class);
 
-        return $repo->one([ICondition::FIELD__NAME => $this->getConditionName()]);
+        return $repo->one([ICondition::FIELD__ALIASES => $this->getConditionName()]);
     }
 
     /**
@@ -52,10 +52,15 @@ trait THasCondition
     /**
      * @param mixed $compareWith
      * @return bool
+     * @throws \Exception
      */
     public function isConditionTrue($compareWith): bool
     {
         $condition = $this->getCondition();
+
+        if (!$condition) {
+            throw new \Exception('Unknown condition "' . $this->getConditionName() . '"');
+        }
         $conditionDispatcher = $condition->buildClassWithParameters();
 
         return $conditionDispatcher($compareWith, $condition, $this->getValue());
