@@ -1,10 +1,5 @@
 <?php
 use \PHPUnit\Framework\TestCase;
-use extas\components\Item;
-use extas\interfaces\conditions\IHasCondition;
-use extas\components\conditions\THasCondition;
-use extas\components\THasValue;
-use extas\interfaces\IHasValue;
 use extas\components\conditions\ConditionAnd;
 use extas\components\conditions\ConditionOr;
 use extas\components\conditions\ConditionIn;
@@ -39,6 +34,7 @@ use extas\interfaces\repositories\IRepository;
 use extas\components\plugins\PluginRepository;
 use extas\components\plugins\Plugin;
 use extas\components\plugins\repositories\PluginFieldSelfAlias;
+use extas\components\conditions\ConditionParameter;
 
 /**
  * Class ConditionsTest
@@ -80,17 +76,10 @@ class ConditionsTest extends TestCase
 
     public function testLike()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 'es',
-            IHasCondition::FIELD__CONDITION => '~'
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 'es',
+            ConditionParameter::FIELD__CONDITION => '~'
+        ]);
 
         $this->installCondition('like', ['~'], ConditionLike::class);
 
@@ -106,17 +95,10 @@ class ConditionsTest extends TestCase
 
     public function testNotLike()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 'es',
-            IHasCondition::FIELD__CONDITION => '!~'
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 'es',
+            ConditionParameter::FIELD__CONDITION => '!~'
+        ]);
 
         $this->installCondition('not_like', ['!~'], ConditionNotLike::class);
 
@@ -132,17 +114,10 @@ class ConditionsTest extends TestCase
 
     public function testEmpty()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => '',
-            IHasCondition::FIELD__CONDITION => '@'
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => '',
+            ConditionParameter::FIELD__CONDITION => '@'
+        ]);
 
         $this->installCondition('empty', ['null', '@'], ConditionEmpty::class);
 
@@ -158,17 +133,10 @@ class ConditionsTest extends TestCase
 
     public function testNotEmpty()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => '',
-            IHasCondition::FIELD__CONDITION => '!@'
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => '',
+            ConditionParameter::FIELD__CONDITION => '!@'
+        ]);
 
         $this->installCondition('not_empty', ['!null', '!@'], ConditionNotEmpty::class);
 
@@ -184,8 +152,8 @@ class ConditionsTest extends TestCase
 
     public function testAnd()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => [
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => [
                 [
                     'value' => 5,
                     'condition' => '>'
@@ -195,15 +163,8 @@ class ConditionsTest extends TestCase
                     'condition' => '<'
                 ]
             ],
-            IHasCondition::FIELD__CONDITION => '&'
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+            ConditionParameter::FIELD__CONDITION => '&'
+        ]);
 
         $this->installCondition('and', ['&', '&&'], ConditionAnd::class);
         $this->installCondition('greater', ['>'], ConditionGreater::class);
@@ -219,8 +180,8 @@ class ConditionsTest extends TestCase
 
     public function testOr()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => [
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => [
                 [
                     'value' => 5,
                     'condition' => '>'
@@ -230,15 +191,8 @@ class ConditionsTest extends TestCase
                     'condition' => '<'
                 ]
             ],
-            IHasCondition::FIELD__CONDITION => '||'
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+            ConditionParameter::FIELD__CONDITION => '||'
+        ]);
 
         $this->installCondition('or', ['|', '||'], ConditionOr::class);
         $this->installCondition('greater', ['>'], ConditionGreater::class);
@@ -254,19 +208,12 @@ class ConditionsTest extends TestCase
 
     public function testIn()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => [
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => [
                 'test', 5
             ],
-            IHasCondition::FIELD__CONDITION => '*'
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+            ConditionParameter::FIELD__CONDITION => '*'
+        ]);
 
         $this->installCondition('in', ['*'], ConditionIn::class);
 
@@ -285,19 +232,12 @@ class ConditionsTest extends TestCase
 
     public function testNotIn()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => [
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => [
                 'test', 5
             ],
-            IHasCondition::FIELD__CONDITION => '!*'
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+            ConditionParameter::FIELD__CONDITION => '!*'
+        ]);
 
         $this->installCondition('not_in', ['!*'], ConditionNotIn::class);
 
@@ -316,17 +256,10 @@ class ConditionsTest extends TestCase
 
     public function testEqual()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 5,
-            IHasCondition::FIELD__CONDITION => '='
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 5,
+            ConditionParameter::FIELD__CONDITION => '='
+        ]);
 
         $this->installCondition('equal', ['='], ConditionEqual::class);
 
@@ -340,17 +273,10 @@ class ConditionsTest extends TestCase
 
     public function testEqualLength()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 'abcde',
-            IHasCondition::FIELD__CONDITION => 'l='
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 'abcde',
+            ConditionParameter::FIELD__CONDITION => 'l='
+        ]);
 
         $this->installCondition('equal_length', ['l='], ConditionEqualLength::class);
 
@@ -366,17 +292,10 @@ class ConditionsTest extends TestCase
 
     public function testEqualAlphabet()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 'abc',
-            IHasCondition::FIELD__CONDITION => 'a='
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 'abc',
+            ConditionParameter::FIELD__CONDITION => 'a='
+        ]);
 
         $this->installCondition('equal_alphabet', ['a='], ConditionEqualAlphabet::class);
 
@@ -392,17 +311,10 @@ class ConditionsTest extends TestCase
 
     public function testNotEqual()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 5,
-            IHasCondition::FIELD__CONDITION => '!='
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 5,
+            ConditionParameter::FIELD__CONDITION => '!='
+        ]);
 
         $this->installCondition('not_equal', ['!='], ConditionNotEqual::class);
 
@@ -416,17 +328,10 @@ class ConditionsTest extends TestCase
 
     public function testNotEqualLength()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 'abcde',
-            IHasCondition::FIELD__CONDITION => 'l!='
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 'abcde',
+            ConditionParameter::FIELD__CONDITION => 'l!='
+        ]);
 
         $this->installCondition('not_equal_length', ['l!='], ConditionNotEqualLength::class);
 
@@ -442,17 +347,10 @@ class ConditionsTest extends TestCase
 
     public function testNotEqualAlphabet()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 'abc',
-            IHasCondition::FIELD__CONDITION => 'a!='
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 'abc',
+            ConditionParameter::FIELD__CONDITION => 'a!='
+        ]);
 
         $this->installCondition('not_equal_alphabet', ['a!='], ConditionNotEqualAlphabet::class);
 
@@ -468,17 +366,10 @@ class ConditionsTest extends TestCase
 
     public function testGreater()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 5,
-            IHasCondition::FIELD__CONDITION => '>'
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 5,
+            ConditionParameter::FIELD__CONDITION => '>'
+        ]);
 
         $this->installCondition('greater', ['>'], ConditionGreater::class);
 
@@ -492,17 +383,10 @@ class ConditionsTest extends TestCase
 
     public function testGreaterLength()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 'abc',
-            IHasCondition::FIELD__CONDITION => 'l>'
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 'abc',
+            ConditionParameter::FIELD__CONDITION => 'l>'
+        ]);
 
         $this->installCondition('greater_length', ['l>'], ConditionGreaterLength::class);
 
@@ -518,17 +402,10 @@ class ConditionsTest extends TestCase
 
     public function testGreaterAlphabet()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 'abc',
-            IHasCondition::FIELD__CONDITION => 'a>'
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 'abc',
+            ConditionParameter::FIELD__CONDITION => 'a>'
+        ]);
 
         $this->installCondition('greater_alphabet', ['a>'], ConditionGreaterAlphabet::class);
 
@@ -544,17 +421,10 @@ class ConditionsTest extends TestCase
 
     public function testGreaterOrEqual()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 5,
-            IHasCondition::FIELD__CONDITION => '>='
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 5,
+            ConditionParameter::FIELD__CONDITION => '>='
+        ]);
 
         $this->installCondition('greater_or_equal', ['>='], ConditionGreaterOrEqual::class);
 
@@ -568,17 +438,10 @@ class ConditionsTest extends TestCase
 
     public function testGreaterOrEqualLength()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 'abc',
-            IHasCondition::FIELD__CONDITION => 'l>='
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 'abc',
+            ConditionParameter::FIELD__CONDITION => 'l>='
+        ]);
 
         $this->installCondition('greater_or_equal_length', ['l>='], ConditionGreaterOrEqualLength::class);
 
@@ -595,17 +458,10 @@ class ConditionsTest extends TestCase
 
     public function testGreaterOrEqualAlphabet()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 'abc',
-            IHasCondition::FIELD__CONDITION => 'a>='
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 'abc',
+            ConditionParameter::FIELD__CONDITION => 'a>='
+        ]);
 
         $this->installCondition(
             'greater_or_equal_alphabet',
@@ -626,17 +482,10 @@ class ConditionsTest extends TestCase
 
     public function testLower()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 5,
-            IHasCondition::FIELD__CONDITION => '<'
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 5,
+            ConditionParameter::FIELD__CONDITION => '<'
+        ]);
 
         $this->installCondition('lower', ['<'], ConditionLower::class);
 
@@ -650,17 +499,10 @@ class ConditionsTest extends TestCase
 
     public function testLowerLength()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 'abc',
-            IHasCondition::FIELD__CONDITION => 'l<'
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 'abc',
+            ConditionParameter::FIELD__CONDITION => 'l<'
+        ]);
 
         $this->installCondition('lower_length', ['l<'], ConditionLowerLength::class);
 
@@ -676,17 +518,10 @@ class ConditionsTest extends TestCase
 
     public function testLowerAlphabet()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 'abc',
-            IHasCondition::FIELD__CONDITION => 'a<'
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 'abc',
+            ConditionParameter::FIELD__CONDITION => 'a<'
+        ]);
 
         $this->installCondition('lower_alphabet', ['a<'], ConditionLowerAlphabet::class);
 
@@ -702,17 +537,10 @@ class ConditionsTest extends TestCase
 
     public function testLowerOrEqual()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 5,
-            IHasCondition::FIELD__CONDITION => '<='
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 5,
+            ConditionParameter::FIELD__CONDITION => '<='
+        ]);
 
         $this->installCondition('lower_or_equal', ['<='], ConditionLowerOrEqual::class);
 
@@ -726,17 +554,10 @@ class ConditionsTest extends TestCase
 
     public function testLowerOrEqualLength()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 'abc',
-            IHasCondition::FIELD__CONDITION => 'l<='
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 'abc',
+            ConditionParameter::FIELD__CONDITION => 'l<='
+        ]);
 
         $this->installCondition('lower_or_equal_length', ['l<='], ConditionLowerOrEqualLength::class);
 
@@ -753,17 +574,10 @@ class ConditionsTest extends TestCase
 
     public function testLowerOrEqualAlphabet()
     {
-        $hasCondition = new class ([
-            IHasValue::FIELD__VALUE => 'abc',
-            IHasCondition::FIELD__CONDITION => 'a<='
-        ]) extends Item implements IHasCondition {
-            use THasCondition;
-            use THasValue;
-            protected function getSubjectForExtension(): string
-            {
-                return '';
-            }
-        };
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => 'abc',
+            ConditionParameter::FIELD__CONDITION => 'a<='
+        ]);
 
         $this->installCondition('lower_or_equal_alphabet', ['a<='], ConditionLowerOrEqualAlphabet::class);
 
@@ -777,8 +591,6 @@ class ConditionsTest extends TestCase
         $hasCondition->setConditionName('lower_or_equal_alphabet');
         $this->assertTrue($hasCondition->isConditionTrue(400));
     }
-
-
 
     /**
      * @param string $name
