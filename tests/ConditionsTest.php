@@ -355,7 +355,7 @@ class ConditionsTest extends TestCase
         $this->assertTrue($hasCondition->isConditionTrue(70));
 
         $hasCondition->setConditionName('equal_length');
-        $this->assertTrue($hasCondition->isConditionTrue('edcba'));
+        $this->assertTrue($hasCondition->isConditionTrue('ab'));
     }
 
     public function testEqualAlphabet()
@@ -381,7 +381,7 @@ class ConditionsTest extends TestCase
         $this->assertTrue($hasCondition->isConditionTrue(50));
 
         $hasCondition->setConditionName('equal_alphabet');
-        $this->assertTrue($hasCondition->isConditionTrue('abc'));
+        $this->assertTrue($hasCondition->isConditionTrue(50));
     }
 
     public function testNotEqual()
@@ -428,10 +428,10 @@ class ConditionsTest extends TestCase
         $this->assertFalse($hasCondition->isConditionTrue('fghij'));
 
         $hasCondition->setValue(50);
-        $this->assertTrue($hasCondition->isConditionTrue(50));
+        $this->assertTrue($hasCondition->isConditionTrue(500));
 
         $hasCondition->setConditionName('not_equal_length');
-        $this->assertTrue($hasCondition->isConditionTrue('fedcba'));
+        $this->assertTrue($hasCondition->isConditionTrue('test'));
     }
 
     public function testNotEqualAlphabet()
