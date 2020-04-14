@@ -5,6 +5,8 @@ use extas\interfaces\conditions\IHasCondition;
 use extas\components\conditions\THasCondition;
 use extas\components\THasValue;
 use extas\interfaces\IHasValue;
+use extas\components\conditions\ConditionAnd;
+use extas\components\conditions\ConditionOr;
 use extas\components\conditions\ConditionIn;
 use extas\components\conditions\ConditionNotIn;
 use extas\components\conditions\ConditionEmpty;
@@ -203,7 +205,7 @@ class ConditionsTest extends TestCase
             }
         };
 
-        $this->installCondition('and', ['&', '&&'], ConditionIn::class);
+        $this->installCondition('and', ['&', '&&'], ConditionAnd::class);
 
         $this->assertTrue($hasCondition->isConditionTrue('6'));
         $this->assertTrue($hasCondition->isConditionTrue(7));
@@ -236,7 +238,7 @@ class ConditionsTest extends TestCase
             }
         };
 
-        $this->installCondition('or', ['|', '||'], ConditionIn::class);
+        $this->installCondition('or', ['|', '||'], ConditionOr::class);
 
         $this->assertTrue($hasCondition->isConditionTrue('6'));
         $this->assertTrue($hasCondition->isConditionTrue(4));
