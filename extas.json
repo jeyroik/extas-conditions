@@ -1,0 +1,15 @@
+{
+  "name": "extas/conditions",
+  "package_classes": [
+    {
+      "class": "extas\\components\\conditions\\ConditionRepository",
+      "interface": "extas\\interfaces\\conditions\\IConditionRepository"
+    }
+  ],
+  "plugins": [
+    {
+      "class": "extas\\components\\plugins\\repositories\\PluginFieldSelfAlias",
+      "stage": "extas.conditions.create.before"
+    }
+  ]
+}

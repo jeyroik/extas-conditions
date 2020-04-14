@@ -34,6 +34,9 @@ use extas\components\conditions\ConditionRepository;
 use extas\interfaces\conditions\IConditionRepository;
 use extas\components\SystemContainer;
 use extas\interfaces\repositories\IRepository;
+use extas\components\plugins\PluginRepository;
+use extas\components\plugins\Plugin;
+use extas\components\plugins\repositories\PluginFieldSelfAlias;
 
 /**
  * Class ConditionsTest
@@ -42,7 +45,15 @@ use extas\interfaces\repositories\IRepository;
  */
 class ConditionsTest extends TestCase
 {
+    /**
+     * @var IRepository|null
+     */
     protected ?IRepository $condRepo = null;
+
+    /**
+     * @var IRepository|null
+     */
+    protected ?IRepository $pluginRepo = null;
 
     protected function setUp(): void
     {
@@ -51,6 +62,7 @@ class ConditionsTest extends TestCase
         $env->load();
 
         $this->condRepo = new ConditionRepository();
+        $this->pluginRepo = new PluginRepository;
 
         SystemContainer::addItem(
             IConditionRepository::class,
@@ -61,6 +73,7 @@ class ConditionsTest extends TestCase
     public function tearDown(): void
     {
         $this->condRepo->delete([Condition::FIELD__NAME => 'test']);
+        $this->pluginRepo->delete([Plugin::FIELD__CLASS => PluginFieldSelfAlias::class]);
     }
 
     public function testLike()
@@ -740,6 +753,11 @@ class ConditionsTest extends TestCase
      */
     protected function installCondition(string $name, array $aliases, string $class)
     {
+        $this->pluginRepo->create(new Plugin([
+            Plugin::FIELD__CLASS => PluginFieldSelfAlias::class,
+            Plugin::FIELD__STAGE => 'extas.conditions.create.before'
+        ]));
+
         $this->condRepo->create(new Condition([
             Condition::FIELD__NAME => $name,
             Condition::FIELD__ALIASES => $aliases,
