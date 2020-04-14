@@ -33,6 +33,7 @@ use extas\components\conditions\Condition;
 use extas\components\conditions\ConditionRepository;
 use extas\interfaces\conditions\IConditionRepository;
 use extas\components\SystemContainer;
+use extas\interfaces\repositories\IRepository;
 
 /**
  * Class ConditionsTest
