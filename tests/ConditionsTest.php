@@ -206,6 +206,8 @@ class ConditionsTest extends TestCase
         };
 
         $this->installCondition('and', ['&', '&&'], ConditionAnd::class);
+        $this->installCondition('greater', ['>'], ConditionGreater::class);
+        $this->installCondition('lower', ['<'], ConditionLower::class);
 
         $this->assertTrue($hasCondition->isConditionTrue('6'));
         $this->assertTrue($hasCondition->isConditionTrue(7));
@@ -239,6 +241,8 @@ class ConditionsTest extends TestCase
         };
 
         $this->installCondition('or', ['|', '||'], ConditionOr::class);
+        $this->installCondition('greater', ['>'], ConditionGreater::class);
+        $this->installCondition('lower', ['<'], ConditionLower::class);
 
         $this->assertTrue($hasCondition->isConditionTrue('6'));
         $this->assertTrue($hasCondition->isConditionTrue(4));
