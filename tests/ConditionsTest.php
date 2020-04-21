@@ -1,4 +1,12 @@
 <?php
+namespace tests;
+
+use extas\components\extensions\Extension;
+use extas\components\extensions\ExtensionHasCondition;
+use extas\components\extensions\ExtensionRepository;
+use extas\components\Item;
+use extas\interfaces\conditions\IHasCondition;
+use extas\interfaces\extensions\IExtensionHasCondition;
 use \PHPUnit\Framework\TestCase;
 use extas\components\conditions\ConditionAnd;
 use extas\components\conditions\ConditionOr;
@@ -33,7 +41,7 @@ use extas\components\SystemContainer;
 use extas\interfaces\repositories\IRepository;
 use extas\components\plugins\PluginRepository;
 use extas\components\plugins\Plugin;
-use extas\components\plugins\repositories\PluginFieldSelfAlias;
+use extas\components\plugins\repositories\PluginFieldSampleName;
 use extas\components\conditions\ConditionParameter;
 
 /**
@@ -53,6 +61,11 @@ class ConditionsTest extends TestCase
      */
     protected ?IRepository $pluginRepo = null;
 
+    /**
+     * @var IRepository|null
+     */
+    protected ?IRepository $extRepo = null;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -61,6 +74,7 @@ class ConditionsTest extends TestCase
 
         $this->condRepo = new ConditionRepository();
         $this->pluginRepo = new PluginRepository;
+        $this->extRepo = new ExtensionRepository();
 
         SystemContainer::addItem(
             IConditionRepository::class,
@@ -71,7 +85,39 @@ class ConditionsTest extends TestCase
     public function tearDown(): void
     {
         $this->condRepo->delete([Condition::FIELD__TITLE => 'test']);
-        $this->pluginRepo->delete([Plugin::FIELD__CLASS => PluginFieldSelfAlias::class]);
+        $this->pluginRepo->delete([Plugin::FIELD__CLASS => PluginFieldSampleName::class]);
+        $this->extRepo->delete([Extension::FIELD__CLASS => ExtensionHasCondition::class]);
+    }
+
+    public function testExtensionHasCondition()
+    {
+        $this->extRepo->create(new Extension([
+            Extension::FIELD__CLASS => ExtensionHasCondition::class,
+            Extension::FIELD__INTERFACE => IExtensionHasCondition::class,
+            Extension::FIELD__METHODS => [
+                'isConditionTrue',
+                'getConditionName',
+                'getCondition',
+                'setConditionName'
+            ],
+            Extension::FIELD__SUBJECT => 'test'
+        ]));
+
+        /**
+         * @var IExtensionHasCondition $test
+         */
+        $test = new class([
+            IHasCondition::FIELD__VALUE => 5,
+            IHasCondition::FIELD__CONDITION => 'eq'
+        ]) extends Item {
+            protected function getSubjectForExtension(): string
+            {
+                return 'test';
+            }
+        };
+
+        $this->installCondition('eq', ['='], ConditionEqual::class);
+        $this->assertTrue($test->isConditionTrue(5));
     }
 
     public function testUnknownCondition()
@@ -619,7 +665,7 @@ class ConditionsTest extends TestCase
     protected function installCondition(string $name, array $aliases, string $class)
     {
         $this->pluginRepo->create(new Plugin([
-            Plugin::FIELD__CLASS => PluginFieldSelfAlias::class,
+            Plugin::FIELD__CLASS => PluginFieldSampleName::class,
             Plugin::FIELD__STAGE => 'extas.conditions.create.before'
         ]));
 
