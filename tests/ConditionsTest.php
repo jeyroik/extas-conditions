@@ -119,6 +119,93 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('eq', ['='], ConditionEqual::class);
         $this->assertTrue($test->isConditionTrue(5));
+        $this->assertEquals('eq', $test->getConditionName());
+        $test->setConditionName('=');
+        $this->assertEquals('eq', $test->getCondition()->getName());
+    }
+
+    public function testExtensionHasConditionFailIsConditionTrue()
+    {
+        $this->extRepo->create(new Extension([
+            Extension::FIELD__CLASS => ExtensionHasCondition::class,
+            Extension::FIELD__INTERFACE => IExtensionHasCondition::class,
+            Extension::FIELD__METHODS => [
+                'isConditionTrue',
+                'getConditionName',
+                'getCondition',
+                'setConditionName'
+            ],
+            Extension::FIELD__SUBJECT => 'test'
+        ]));
+
+        /**
+         * @var IExtensionHasCondition $test
+         */
+        $test = new class() extends Item {
+            protected function getSubjectForExtension(): string
+            {
+                return 'test';
+            }
+        };
+
+        $this->expectExceptionMessage('Missed ' . IHasCondition::FIELD__CONDITION . ' parameter');
+        $test->isConditionTrue(5);
+    }
+
+    public function testExtensionHasConditionFailGetConditionName()
+    {
+        $this->extRepo->create(new Extension([
+            Extension::FIELD__CLASS => ExtensionHasCondition::class,
+            Extension::FIELD__INTERFACE => IExtensionHasCondition::class,
+            Extension::FIELD__METHODS => [
+                'isConditionTrue',
+                'getConditionName',
+                'getCondition',
+                'setConditionName'
+            ],
+            Extension::FIELD__SUBJECT => 'test'
+        ]));
+
+        /**
+         * @var IExtensionHasCondition $test
+         */
+        $test = new class() extends Item {
+            protected function getSubjectForExtension(): string
+            {
+                return 'test';
+            }
+        };
+
+        $this->expectExceptionMessage('Missed ' . IHasCondition::FIELD__CONDITION . ' parameter');
+        $test->getConditionName();
+    }
+
+    public function testExtensionHasConditionFailGetCondition()
+    {
+        $this->extRepo->create(new Extension([
+            Extension::FIELD__CLASS => ExtensionHasCondition::class,
+            Extension::FIELD__INTERFACE => IExtensionHasCondition::class,
+            Extension::FIELD__METHODS => [
+                'isConditionTrue',
+                'getConditionName',
+                'getCondition',
+                'setConditionName'
+            ],
+            Extension::FIELD__SUBJECT => 'test'
+        ]));
+
+        /**
+         * @var IExtensionHasCondition $test
+         */
+        $test = new class() extends Item {
+            protected function getSubjectForExtension(): string
+            {
+                return 'test';
+            }
+        };
+
+        $this->expectExceptionMessage('Missed ' . IHasCondition::FIELD__CONDITION . ' parameter');
+        $test->getCondition();
     }
 
     public function testUnknownCondition()
