@@ -5,6 +5,7 @@ use extas\components\extensions\Extension;
 use extas\components\extensions\ExtensionHasCondition;
 use extas\components\extensions\ExtensionRepository;
 use extas\components\Item;
+use extas\components\plugins\repositories\PluginFieldSelfAlias;
 use extas\interfaces\conditions\IHasCondition;
 use extas\interfaces\extensions\IExtensionHasCondition;
 use \PHPUnit\Framework\TestCase;
@@ -665,7 +666,7 @@ class ConditionsTest extends TestCase
     protected function installCondition(string $name, array $aliases, string $class)
     {
         $this->pluginRepo->create(new Plugin([
-            Plugin::FIELD__CLASS => PluginFieldSampleName::class,
+            Plugin::FIELD__CLASS => PluginFieldSelfAlias::class,
             Plugin::FIELD__STAGE => 'extas.conditions.create.before'
         ]));
 
