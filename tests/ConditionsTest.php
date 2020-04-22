@@ -1,6 +1,9 @@
 <?php
 namespace tests;
 
+use extas\components\conditions\ConditionLikeOneIn;
+use extas\components\conditions\ConditionNotLikeOneIn;
+use extas\components\conditions\ConditionNotRegEx;
 use extas\components\conditions\ConditionRegEx;
 use extas\components\extensions\Extension;
 use extas\components\extensions\ExtensionHasCondition;
@@ -243,7 +246,7 @@ class ConditionsTest extends TestCase
             ConditionParameter::FIELD__CONDITION => '!#'
         ]);
 
-        $this->installCondition('not_regex', ['!#'], ConditionRegEx::class);
+        $this->installCondition('not_regex', ['!#'], ConditionNotRegEx::class);
 
         $this->assertFalse($hasCondition->isConditionTrue('@test me please'));
         $this->assertTrue($hasCondition->isConditionTrue('tt'));
@@ -261,7 +264,7 @@ class ConditionsTest extends TestCase
             ConditionParameter::FIELD__CONDITION => '~*'
         ]);
 
-        $this->installCondition('like_one_in', ['~*'], ConditionIn::class);
+        $this->installCondition('like_one_in', ['~*'], ConditionLikeOneIn::class);
 
         $this->assertTrue($hasCondition->isConditionTrue('test'));
         $this->assertTrue($hasCondition->isConditionTrue(55));
@@ -283,7 +286,7 @@ class ConditionsTest extends TestCase
             ConditionParameter::FIELD__CONDITION => '!~*'
         ]);
 
-        $this->installCondition('not_like_one_in', ['!~*'], ConditionIn::class);
+        $this->installCondition('not_like_one_in', ['!~*'], ConditionNotLikeOneIn::class);
 
         $this->assertFalse($hasCondition->isConditionTrue('test'));
         $this->assertFalse($hasCondition->isConditionTrue(55));
