@@ -1,6 +1,7 @@
 <?php
 namespace tests;
 
+use extas\components\conditions\ConditionRegEx;
 use extas\components\extensions\Extension;
 use extas\components\extensions\ExtensionHasCondition;
 use extas\components\extensions\ExtensionRepository;
@@ -217,6 +218,82 @@ class ConditionsTest extends TestCase
 
         $this->expectExceptionMessage('Unknown condition "unknown"');
         $hasCondition->isConditionTrue('test');
+    }
+
+    public function testRegEx()
+    {
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => '/@test(.*)/',
+            ConditionParameter::FIELD__CONDITION => '#'
+        ]);
+
+        $this->installCondition('regex', ['#'], ConditionRegEx::class);
+
+        $this->assertTrue($hasCondition->isConditionTrue('@test me please'));
+        $this->assertFalse($hasCondition->isConditionTrue('tt'));
+
+        $hasCondition->setConditionName('regex');
+        $this->assertTrue($hasCondition->isConditionTrue('@test again'));
+    }
+
+    public function testNotRegEx()
+    {
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => '/@test(.*)/',
+            ConditionParameter::FIELD__CONDITION => '!#'
+        ]);
+
+        $this->installCondition('not_regex', ['!#'], ConditionRegEx::class);
+
+        $this->assertFalse($hasCondition->isConditionTrue('@test me please'));
+        $this->assertTrue($hasCondition->isConditionTrue('tt'));
+
+        $hasCondition->setConditionName('not_regex');
+        $this->assertTrue($hasCondition->isConditionTrue('again'));
+    }
+
+    public function testLikeOneIn()
+    {
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => [
+                'es', 5
+            ],
+            ConditionParameter::FIELD__CONDITION => '~*'
+        ]);
+
+        $this->installCondition('like_one_in', ['~*'], ConditionIn::class);
+
+        $this->assertTrue($hasCondition->isConditionTrue('test'));
+        $this->assertTrue($hasCondition->isConditionTrue(55));
+        $this->assertFalse($hasCondition->isConditionTrue(7));
+
+        $hasCondition->setValue('test');
+        $this->assertTrue($hasCondition->isConditionTrue('tester'));
+
+        $hasCondition->setConditionName('like_one_in');
+        $this->assertTrue($hasCondition->isConditionTrue('test'));
+    }
+
+    public function testNotLikeOneIn()
+    {
+        $hasCondition = new ConditionParameter ([
+            ConditionParameter::FIELD__VALUE => [
+                'es', 5
+            ],
+            ConditionParameter::FIELD__CONDITION => '!~*'
+        ]);
+
+        $this->installCondition('not_like_one_in', ['!~*'], ConditionIn::class);
+
+        $this->assertFalse($hasCondition->isConditionTrue('test'));
+        $this->assertFalse($hasCondition->isConditionTrue(55));
+        $this->assertTrue($hasCondition->isConditionTrue(7));
+
+        $hasCondition->setValue('test');
+        $this->assertFalse($hasCondition->isConditionTrue('tester'));
+
+        $hasCondition->setConditionName('not_like_one_in');
+        $this->assertFalse($hasCondition->isConditionTrue('test'));
     }
 
     public function testLike()
