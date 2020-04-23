@@ -1,5 +1,6 @@
 ![tests](https://github.com/jeyroik/extas-conditions/workflows/PHP%20Composer/badge.svg?branch=master&event=push)
-![codecov.io](https://codecov.io/gh/jeyroik/extas-conditions/coverage.svg?branch=master)
+![codecov.io](https://codecov.io/gh/jeyroik/extas-conditions/coverage.svg?branch=master) 
+<a href="https://codeclimate.com/github/jeyroik/extas-conditions/maintainability"><img src="https://api.codeclimate.com/v1/badges/75161f4b9667f6a7d3d6/maintainability" /></a>
 
 # Описание
 
