@@ -5,6 +5,7 @@ use extas\components\conditions\ConditionLikeOneIn;
 use extas\components\conditions\ConditionNotLikeOneIn;
 use extas\components\conditions\ConditionNotRegEx;
 use extas\components\conditions\ConditionRegEx;
+use extas\components\conditions\ConditionWith;
 use extas\components\extensions\Extension;
 use extas\components\extensions\ExtensionHasCondition;
 use extas\components\extensions\ExtensionRepository;

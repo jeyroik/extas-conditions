@@ -1,7 +1,7 @@
 <?php
 namespace extas\components\extensions;
 
-use extas\components\conditions\WithConditions;
+use extas\components\conditions\ConditionParameter;
 use extas\interfaces\conditions\ICondition;
 use extas\interfaces\conditions\IHasCondition;
 use extas\interfaces\extensions\IExtensionHasCondition;
@@ -24,7 +24,7 @@ class ExtensionHasCondition extends Extension implements IExtensionHasCondition
     public function isConditionTrue($compareWith, IItem $item = null): bool
     {
         if (isset($item[IHasCondition::FIELD__CONDITION])) {
-            $withConditions = new WithConditions($item->__toArray());
+            $withConditions = new ConditionParameter($item->__toArray());
             return $withConditions->isConditionTrue($compareWith);
         }
 
@@ -39,7 +39,7 @@ class ExtensionHasCondition extends Extension implements IExtensionHasCondition
     public function getConditionName(IItem $item = null): string
     {
         if (isset($item[IHasCondition::FIELD__CONDITION])) {
-            $withConditions = new WithConditions($item->__toArray());
+            $withConditions = new ConditionParameter($item->__toArray());
             return $withConditions->getConditionName();
         }
 
@@ -66,7 +66,7 @@ class ExtensionHasCondition extends Extension implements IExtensionHasCondition
     public function getCondition(IItem $item = null): ?ICondition
     {
         if (isset($item[IHasCondition::FIELD__CONDITION])) {
-            $withConditions = new WithConditions($item->__toArray());
+            $withConditions = new ConditionParameter($item->__toArray());
             return $withConditions->getCondition();
         }
 
