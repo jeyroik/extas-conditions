@@ -2,6 +2,7 @@
 namespace tests;
 
 use Dotenv\Dotenv;
+use extas\components\plugins\TSnuffPlugins;
 use \PHPUnit\Framework\TestCase;
 use extas\components\plugins\repositories\PluginFieldSelfAlias;
 use extas\components\conditions\ConditionLikeOneIn;
@@ -43,7 +44,6 @@ use extas\components\conditions\ConditionLowerAlphabet;
 use extas\components\conditions\ConditionLowerOrEqualAlphabet;
 use extas\components\conditions\Condition;
 use extas\components\conditions\ConditionRepository;
-use extas\interfaces\conditions\IConditionRepository;
 use extas\interfaces\repositories\IRepository;
 use extas\components\plugins\PluginRepository;
 use extas\components\plugins\Plugin;
@@ -58,6 +58,7 @@ use extas\components\conditions\ConditionParameter;
 class ConditionsTest extends TestCase
 {
     use TSnuffExtensions;
+    use TSnuffPlugins;
 
     /**
      * @var IRepository|null
@@ -92,8 +93,11 @@ class ConditionsTest extends TestCase
     public function tearDown(): void
     {
         $this->deleteSnuffExtensions();
+        $this->deleteSnuffPlugins();
         $this->condRepo->delete([Condition::FIELD__TITLE => 'test']);
-        $this->pluginRepo->delete([Plugin::FIELD__CLASS => PluginFieldSampleName::class]);
+        $this->pluginRepo->delete([
+            Plugin::FIELD__CLASS => PluginFieldSampleName::class
+        ]);
         $this->extRepo->delete([Extension::FIELD__CLASS => ExtensionHasCondition::class]);
     }
 
@@ -835,10 +839,7 @@ class ConditionsTest extends TestCase
      */
     protected function installCondition(string $name, array $aliases, string $class)
     {
-        $this->pluginRepo->create(new Plugin([
-            Plugin::FIELD__CLASS => PluginFieldSelfAlias::class,
-            Plugin::FIELD__STAGE => 'extas.conditions.create.before'
-        ]));
+        $this->createSnuffPlugin(PluginFieldSelfAlias::class, ['extas.conditions.create.before']);
 
         $this->condRepo->create(new Condition([
             Condition::FIELD__NAME => $name,
