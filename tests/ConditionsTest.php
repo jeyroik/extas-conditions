@@ -3,6 +3,7 @@ namespace tests;
 
 use Dotenv\Dotenv;
 use \PHPUnit\Framework\TestCase;
+use extas\components\plugins\repositories\PluginFieldSelfAlias;
 use extas\components\conditions\ConditionLikeOneIn;
 use extas\components\conditions\ConditionNotLikeOneIn;
 use extas\components\conditions\ConditionNotRegEx;
@@ -82,7 +83,9 @@ class ConditionsTest extends TestCase
         $this->condRepo = new ConditionRepository();
         $this->pluginRepo = new PluginRepository;
         $this->extRepo = new ExtensionRepository();
-        $this->addReposForExt([IConditionRepository::class => ConditionRepository::class]);
+        $this->addReposForExt([
+            'conditionRepository' => ConditionRepository::class
+        ]);
         $this->createRepoExt(['conditionRepository']);
     }
 
