@@ -21,6 +21,6 @@ class ConditionEmpty extends Plugin implements IConditionDispatcher
      */
     public function __invoke($compareWith, $compareTo): bool
     {
-        return is_null($compareWith);
+        return !$compareTo && is_null($compareWith);
     }
 }
