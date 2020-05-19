@@ -12,16 +12,6 @@
       "stage": "extas.conditions.create.before"
     }
   ],
-  "extensions": [
-    {
-      "class": "extas\\components\\extensions\\ExtensionRepositoryGet",
-      "interface": "extas\\interfaces\\extensions\\IExtensionRepositoryGet",
-      "subject": "*",
-      "methods": [
-        "conditionRepository"
-      ]
-    }
-  ],
   "conditions": [
     {
       "name": "and",
