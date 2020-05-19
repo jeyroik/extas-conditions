@@ -26,8 +26,8 @@ class ConditionIn extends Plugin implements IConditionDispatcher
         if (is_array($compareWith)) {
             $intersect = array_intersect($compareWith, $compareTo);
             return count($intersect) >= count($compareWith);
-        } else {
-            return in_array($compareWith, $compareTo);
         }
+        
+        return in_array($compareWith, $compareTo);
     }
 }
