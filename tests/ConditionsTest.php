@@ -1,19 +1,19 @@
 <?php
 namespace tests;
 
+use Dotenv\Dotenv;
+use \PHPUnit\Framework\TestCase;
 use extas\components\conditions\ConditionLikeOneIn;
 use extas\components\conditions\ConditionNotLikeOneIn;
 use extas\components\conditions\ConditionNotRegEx;
 use extas\components\conditions\ConditionRegEx;
-use extas\components\conditions\ConditionWith;
 use extas\components\extensions\Extension;
 use extas\components\extensions\ExtensionHasCondition;
 use extas\components\extensions\ExtensionRepository;
+use extas\components\extensions\TSnuffExtensions;
 use extas\components\Item;
-use extas\components\plugins\repositories\PluginFieldSelfAlias;
 use extas\interfaces\conditions\IHasCondition;
 use extas\interfaces\extensions\IExtensionHasCondition;
-use \PHPUnit\Framework\TestCase;
 use extas\components\conditions\ConditionAnd;
 use extas\components\conditions\ConditionOr;
 use extas\components\conditions\ConditionIn;
@@ -43,7 +43,6 @@ use extas\components\conditions\ConditionLowerOrEqualAlphabet;
 use extas\components\conditions\Condition;
 use extas\components\conditions\ConditionRepository;
 use extas\interfaces\conditions\IConditionRepository;
-use extas\components\SystemContainer;
 use extas\interfaces\repositories\IRepository;
 use extas\components\plugins\PluginRepository;
 use extas\components\plugins\Plugin;
@@ -57,6 +56,8 @@ use extas\components\conditions\ConditionParameter;
  */
 class ConditionsTest extends TestCase
 {
+    use TSnuffExtensions;
+
     /**
      * @var IRepository|null
      */
@@ -75,21 +76,19 @@ class ConditionsTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-        $env = \Dotenv\Dotenv::create(getcwd() . '/tests/');
+        $env = Dotenv::create(getcwd() . '/tests/');
         $env->load();
 
         $this->condRepo = new ConditionRepository();
         $this->pluginRepo = new PluginRepository;
         $this->extRepo = new ExtensionRepository();
-
-        SystemContainer::addItem(
-            IConditionRepository::class,
-            ConditionRepository::class
-        );
+        $this->addReposForExt([IConditionRepository::class => ConditionRepository::class]);
+        $this->createRepoExt(['conditionRepository']);
     }
 
     public function tearDown(): void
     {
+        $this->deleteSnuffExtensions();
         $this->condRepo->delete([Condition::FIELD__TITLE => 'test']);
         $this->pluginRepo->delete([Plugin::FIELD__CLASS => PluginFieldSampleName::class]);
         $this->extRepo->delete([Extension::FIELD__CLASS => ExtensionHasCondition::class]);
