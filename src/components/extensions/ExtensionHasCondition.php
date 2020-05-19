@@ -2,6 +2,8 @@
 namespace extas\components\extensions;
 
 use extas\components\conditions\ConditionParameter;
+use extas\components\exceptions\conditions\ExceptionMissedConditionParameter;
+use extas\components\exceptions\conditions\ExceptionUnknownCondition;
 use extas\interfaces\conditions\ICondition;
 use extas\interfaces\conditions\IHasCondition;
 use extas\interfaces\extensions\IExtensionHasCondition;
@@ -19,7 +21,7 @@ class ExtensionHasCondition extends Extension implements IExtensionHasCondition
      * @param mixed $compareWith
      * @param IItem|null $item
      * @return bool
-     * @throws \Exception
+     * @throws ExceptionMissedConditionParameter|ExceptionUnknownCondition
      */
     public function isConditionTrue($compareWith, IItem $item = null): bool
     {
@@ -28,13 +30,13 @@ class ExtensionHasCondition extends Extension implements IExtensionHasCondition
             return $withConditions->isConditionTrue($compareWith);
         }
 
-        throw new \Exception('Missed ' . IHasCondition::FIELD__CONDITION . ' parameter');
+        throw new ExceptionMissedConditionParameter();
     }
 
     /**
      * @param IItem|null $item
      * @return string
-     * @throws \Exception
+     * @throws ExceptionMissedConditionParameter
      */
     public function getConditionName(IItem $item = null): string
     {
@@ -43,7 +45,7 @@ class ExtensionHasCondition extends Extension implements IExtensionHasCondition
             return $withConditions->getConditionName();
         }
 
-        throw new \Exception('Missed ' . IHasCondition::FIELD__CONDITION . ' parameter');
+        throw new ExceptionMissedConditionParameter();
     }
 
     /**
@@ -61,7 +63,7 @@ class ExtensionHasCondition extends Extension implements IExtensionHasCondition
     /**
      * @param IItem|null $item
      * @return ICondition|null
-     * @throws \Exception
+     * @throws ExceptionMissedConditionParameter
      */
     public function getCondition(IItem $item = null): ?ICondition
     {
@@ -70,6 +72,6 @@ class ExtensionHasCondition extends Extension implements IExtensionHasCondition
             return $withConditions->getCondition();
         }
 
-        throw new \Exception('Missed ' . IHasCondition::FIELD__CONDITION . ' parameter');
+        throw new ExceptionMissedConditionParameter();
     }
 }
