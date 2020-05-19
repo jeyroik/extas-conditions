@@ -14,13 +14,12 @@ class ConditionNotLikeOneIn extends ConditionLikeOneIn implements IConditionDisp
 {
     /**
      * @param mixed $compareWith
-     * @param ICondition $condition
      * @param mixed $compareTo
      *
      * @return bool
      */
-    public function __invoke($compareWith, ICondition $condition, $compareTo): bool
+    public function __invoke($compareWith, $compareTo): bool
     {
-        return !parent::__invoke($compareWith, $condition, $compareTo);
+        return !parent::__invoke($compareWith, $compareTo);
     }
 }

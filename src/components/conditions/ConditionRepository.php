@@ -12,7 +12,6 @@ use extas\interfaces\conditions\IConditionRepository;
  */
 class ConditionRepository extends Repository implements IConditionRepository
 {
-    protected string $idAs = '';
     protected string $pk = Condition::FIELD__NAME;
     protected string $name = 'conditions';
     protected string $scope = 'extas';

@@ -55,8 +55,8 @@ trait THasCondition
         if (!$condition) {
             throw new \Exception('Unknown condition "' . $this->getConditionName() . '"');
         }
-        $conditionDispatcher = $condition->buildClassWithParameters();
+        $conditionDispatcher = $condition->buildClassWithParameters($condition->__toArray());
 
-        return $conditionDispatcher($compareWith, $condition, $this->getValue());
+        return $conditionDispatcher($compareWith, $this->getValue());
     }
 }

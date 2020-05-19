@@ -18,12 +18,11 @@ class ConditionAnd extends Plugin implements IConditionDispatcher
 {
     /**
      * @param mixed $compareWith
-     * @param ICondition $condition
      * @param mixed $compareTo
      * @return bool
      * @throws \Exception
      */
-    public function __invoke($compareWith, ICondition $condition, $compareTo): bool
+    public function __invoke($compareWith, $compareTo): bool
     {
         if (is_array($compareTo)) {
             $result = null;
@@ -33,9 +32,9 @@ class ConditionAnd extends Plugin implements IConditionDispatcher
             }
 
             return (bool) $result;
-        } else {
-            throw new \Exception('Need array as argument in a condition');
         }
+
+        throw new \Exception('Need array as argument in a condition');
     }
 
     /**

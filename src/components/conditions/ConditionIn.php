@@ -15,20 +15,19 @@ class ConditionIn extends Plugin implements IConditionDispatcher
 {
     /**
      * @param mixed $compareWith
-     * @param ICondition $condition
      * @param mixed $compareTo
      *
      * @return bool
      */
-    public function __invoke($compareWith, ICondition $condition, $compareTo): bool
+    public function __invoke($compareWith, $compareTo): bool
     {
         $compareTo = is_array($compareTo) ? $compareTo : [$compareTo];
 
         if (is_array($compareWith)) {
             $intersect = array_intersect($compareWith, $compareTo);
             return count($intersect) >= count($compareWith);
-        } else {
-            return in_array($compareWith, $compareTo);
         }
+        
+        return in_array($compareWith, $compareTo);
     }
 }
