@@ -1,9 +1,7 @@
 <?php
 namespace extas\components\conditions;
 
-use extas\components\SystemContainer;
 use extas\interfaces\conditions\ICondition;
-use extas\interfaces\conditions\IConditionRepository;
 use extas\interfaces\conditions\IHasCondition;
 
 /**
@@ -11,6 +9,7 @@ use extas\interfaces\conditions\IHasCondition;
  *
  * @property $config
  * @method getValue()
+ * @method conditionRepository()
  *
  * @package extas\components\conditions
  * @author jeyroik <jeyroik@gmail.com>
@@ -30,12 +29,7 @@ trait THasCondition
      */
     public function getCondition(): ?ICondition
     {
-        /**
-         * @var $repo IConditionRepository
-         */
-        $repo = SystemContainer::getItem(IConditionRepository::class);
-
-        return $repo->one([ICondition::FIELD__ALIASES => $this->getConditionName()]);
+        return $this->conditionRepository()->one([ICondition::FIELD__ALIASES => $this->getConditionName()]);
     }
 
     /**
