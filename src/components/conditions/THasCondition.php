@@ -1,6 +1,7 @@
 <?php
 namespace extas\components\conditions;
 
+use extas\components\exceptions\conditions\ExceptionUnknownCondition;
 use extas\interfaces\conditions\ICondition;
 use extas\interfaces\conditions\IHasCondition;
 
@@ -46,14 +47,14 @@ trait THasCondition
     /**
      * @param mixed $compareWith
      * @return bool
-     * @throws \Exception
+     * @throws ExceptionUnknownCondition
      */
     public function isConditionTrue($compareWith): bool
     {
         $condition = $this->getCondition();
 
         if (!$condition) {
-            throw new \Exception('Unknown condition "' . $this->getConditionName() . '"');
+            throw new ExceptionUnknownCondition($this->getConditionName());
         }
         $conditionDispatcher = $condition->buildClassWithParameters($condition->__toArray());
 
