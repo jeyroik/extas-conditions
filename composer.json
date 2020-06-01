@@ -2,7 +2,6 @@
   "name": "jeyroik/extas-conditions",
   "description": "Extas conditions package",
   "require": {
-    "jeyroik/extas-installer": "2.*",
     "jeyroik/extas-repositories-fields-aliases": "0.*",
     "jeyroik/extas-repositories-fields-sample-names": "0.*",
     "jeyroik/extas-samples": "2.*",
