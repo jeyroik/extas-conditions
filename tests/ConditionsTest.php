@@ -3,6 +3,7 @@ namespace tests;
 
 use Dotenv\Dotenv;
 use extas\components\plugins\TSnuffPlugins;
+use extas\components\repositories\TSnuffRepository;
 use \PHPUnit\Framework\TestCase;
 use extas\components\plugins\repositories\PluginFieldSelfAlias;
 use extas\components\conditions\ConditionLikeOneIn;
@@ -57,53 +58,29 @@ use extas\components\conditions\ConditionParameter;
  */
 class ConditionsTest extends TestCase
 {
-    use TSnuffExtensions;
+    use TSnuffRepository;
     use TSnuffPlugins;
-
-    /**
-     * @var IRepository|null
-     */
-    protected ?IRepository $condRepo = null;
-
-    /**
-     * @var IRepository|null
-     */
-    protected ?IRepository $pluginRepo = null;
-
-    /**
-     * @var IRepository|null
-     */
-    protected ?IRepository $extRepo = null;
 
     protected function setUp(): void
     {
         parent::setUp();
         $env = Dotenv::create(getcwd() . '/tests/');
         $env->load();
-
-        $this->condRepo = new ConditionRepository();
-        $this->pluginRepo = new PluginRepository;
-        $this->extRepo = new ExtensionRepository();
-        $this->addReposForExt([
-            'conditionRepository' => ConditionRepository::class
+        $this->registerSnuffRepos([
+            'conditionRepository' => ConditionRepository::class,
+            'extensionRepository' => ExtensionRepository::class,
+            'pluginRepository' => PluginRepository::class
         ]);
-        $this->createRepoExt(['conditionRepository']);
     }
 
     public function tearDown(): void
     {
-        $this->deleteSnuffExtensions();
-        $this->deleteSnuffPlugins();
-        $this->condRepo->delete([Condition::FIELD__TITLE => 'test']);
-        $this->pluginRepo->delete([
-            Plugin::FIELD__CLASS => PluginFieldSampleName::class
-        ]);
-        $this->extRepo->delete([Extension::FIELD__CLASS => ExtensionHasCondition::class]);
+        $this->unregisterSnuffRepos();
     }
 
     public function testExtensionHasCondition()
     {
-        $this->extRepo->create(new Extension([
+        $this->createWithSnuffRepo('extensionRepository', new Extension([
             Extension::FIELD__CLASS => ExtensionHasCondition::class,
             Extension::FIELD__INTERFACE => IExtensionHasCondition::class,
             Extension::FIELD__METHODS => [
@@ -137,7 +114,7 @@ class ConditionsTest extends TestCase
 
     public function testExtensionHasConditionFailIsConditionTrue()
     {
-        $this->extRepo->create(new Extension([
+        $this->createWithSnuffRepo('extensionRepository', new Extension([
             Extension::FIELD__CLASS => ExtensionHasCondition::class,
             Extension::FIELD__INTERFACE => IExtensionHasCondition::class,
             Extension::FIELD__METHODS => [
@@ -165,7 +142,7 @@ class ConditionsTest extends TestCase
 
     public function testExtensionHasConditionFailGetConditionName()
     {
-        $this->extRepo->create(new Extension([
+        $this->createWithSnuffRepo('extensionRepository', new Extension([
             Extension::FIELD__CLASS => ExtensionHasCondition::class,
             Extension::FIELD__INTERFACE => IExtensionHasCondition::class,
             Extension::FIELD__METHODS => [
@@ -193,7 +170,7 @@ class ConditionsTest extends TestCase
 
     public function testExtensionHasConditionFailGetCondition()
     {
-        $this->extRepo->create(new Extension([
+        $this->createWithSnuffRepo('extensionRepository', new Extension([
             Extension::FIELD__CLASS => ExtensionHasCondition::class,
             Extension::FIELD__INTERFACE => IExtensionHasCondition::class,
             Extension::FIELD__METHODS => [
@@ -841,7 +818,7 @@ class ConditionsTest extends TestCase
     {
         $this->createSnuffPlugin(PluginFieldSelfAlias::class, ['extas.conditions.create.before']);
 
-        $this->condRepo->create(new Condition([
+        $this->createWithSnuffRepo('conditionRepository', new Condition([
             Condition::FIELD__NAME => $name,
             Condition::FIELD__ALIASES => $aliases,
             Condition::FIELD__CLASS => $class,
