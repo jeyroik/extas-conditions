@@ -10,10 +10,6 @@
     {
       "class": "extas\\components\\plugins\\repositories\\PluginFieldSelfAlias",
       "stage": "extas.conditions.create.before"
-    },
-    {
-      "class": "extas\\components\\plugins\\PluginInstallConditions",
-      "stage": "extas.install"
     }
   ],
   "conditions": [
