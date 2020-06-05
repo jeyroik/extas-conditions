@@ -1,15 +1,35 @@
 {
   "name": "extas/conditions",
+  "installer_version": 3,
   "package_classes": [
     {
       "class": "extas\\components\\conditions\\ConditionRepository",
-      "interface": "extas\\interfaces\\conditions\\IConditionRepository"
+      "interface": "conditionRepository"
     }
   ],
   "plugins": [
     {
       "class": "extas\\components\\plugins\\repositories\\PluginFieldSelfAlias",
-      "stage": "extas.conditions.create.before"
+      "stage": "extas.conditions.create.before",
+      "install_on": "initialization"
+    },
+    {
+      "class": "extas\\components\\plugins\\init\\InitConditions",
+      "stage": "extas.init.section.conditions",
+      "install_on": "initialization"
+    },
+    {
+      "class": "extas\\components\\plugins\\uninstall\\UninstallConditions",
+      "stage": "extas.uninstall.section.conditions",
+      "install_on": "initialization"
+    }
+  ],
+  "extensions": [
+    {
+      "class": "extas\\components\\extensions\\ExtensionRepositoryGet",
+      "interface": "extas\\interfaces\\extensions\\IExtensionRepositoryGet",
+      "subject": "*",
+      "methods": ["conditionRepository"]
     }
   ],
   "conditions": [
