@@ -4,7 +4,7 @@
   "require": {
     "jeyroik/extas-repositories-fields-aliases": "0.*",
     "jeyroik/extas-repositories-fields-sample-names": "0.*",
-    "jeyroik/extas-samples": "3.*",
+    "jeyroik/extas-foundation": "5.*",
     "jeyroik/extas-repositories-get": "0.*"
   },
   "require-dev": {
