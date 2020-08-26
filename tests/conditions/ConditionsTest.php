@@ -1,9 +1,10 @@
 <?php
-namespace tests;
+namespace tests\conditions;
 
 use Dotenv\Dotenv;
 use extas\components\plugins\TSnuffPlugins;
-use extas\components\repositories\TSnuffRepository;
+use extas\components\repositories\TSnuffRepositoryDynamic;
+use extas\components\THasMagicClass;
 use \PHPUnit\Framework\TestCase;
 use extas\components\plugins\repositories\PluginFieldSelfAlias;
 use extas\components\conditions\ConditionLikeOneIn;
@@ -12,8 +13,6 @@ use extas\components\conditions\ConditionNotRegEx;
 use extas\components\conditions\ConditionRegEx;
 use extas\components\extensions\Extension;
 use extas\components\extensions\ExtensionHasCondition;
-use extas\components\extensions\ExtensionRepository;
-use extas\components\extensions\TSnuffExtensions;
 use extas\components\Item;
 use extas\interfaces\conditions\IHasCondition;
 use extas\interfaces\extensions\IExtensionHasCondition;
@@ -44,11 +43,6 @@ use extas\components\conditions\ConditionLowerOrEqualLength;
 use extas\components\conditions\ConditionLowerAlphabet;
 use extas\components\conditions\ConditionLowerOrEqualAlphabet;
 use extas\components\conditions\Condition;
-use extas\components\conditions\ConditionRepository;
-use extas\interfaces\repositories\IRepository;
-use extas\components\plugins\PluginRepository;
-use extas\components\plugins\Plugin;
-use extas\components\plugins\repositories\PluginFieldSampleName;
 use extas\components\conditions\ConditionParameter;
 
 /**
@@ -58,18 +52,17 @@ use extas\components\conditions\ConditionParameter;
  */
 class ConditionsTest extends TestCase
 {
-    use TSnuffRepository;
+    use TSnuffRepositoryDynamic;
     use TSnuffPlugins;
+    use THasMagicClass;
 
     protected function setUp(): void
     {
         parent::setUp();
         $env = Dotenv::create(getcwd() . '/tests/');
         $env->load();
-        $this->registerSnuffRepos([
-            'conditionRepository' => ConditionRepository::class,
-            'extensionRepository' => ExtensionRepository::class,
-            'pluginRepository' => PluginRepository::class
+        $this->createSnuffDynamicRepositories([
+            ['conditions', 'name', Condition::class]
         ]);
     }
 
@@ -817,8 +810,7 @@ class ConditionsTest extends TestCase
     protected function installCondition(string $name, array $aliases, string $class)
     {
         $this->createSnuffPlugin(PluginFieldSelfAlias::class, ['extas.conditions.create.before']);
-
-        $this->createWithSnuffRepo('conditionRepository', new Condition([
+        $this->getMagicClass('conditions')->create(new Condition([
             Condition::FIELD__NAME => $name,
             Condition::FIELD__ALIASES => $aliases,
             Condition::FIELD__CLASS => $class,
