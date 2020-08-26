@@ -4,13 +4,14 @@ namespace extas\components\conditions;
 use extas\components\exceptions\conditions\ExceptionUnknownCondition;
 use extas\interfaces\conditions\ICondition;
 use extas\interfaces\conditions\IHasCondition;
+use extas\interfaces\repositories\IRepository;
 
 /**
  * Trait THasCondition
  *
  * @property $config
  * @method getValue()
- * @method conditionRepository()
+ * @method IRepository conditions()
  *
  * @package extas\components\conditions
  * @author jeyroik <jeyroik@gmail.com>
@@ -30,7 +31,7 @@ trait THasCondition
      */
     public function getCondition(): ?ICondition
     {
-        return $this->conditionRepository()->one([ICondition::FIELD__ALIASES => $this->getConditionName()]);
+        return $this->conditions()->one([ICondition::FIELD__ALIASES => $this->getConditionName()]);
     }
 
     /**
