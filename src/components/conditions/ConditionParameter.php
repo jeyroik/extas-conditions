@@ -1,7 +1,7 @@
 <?php
 namespace extas\components\conditions;
 
-use extas\components\samples\parameters\SampleParameter;
+use extas\components\parameters\Param;
 use extas\interfaces\conditions\IConditionParameter;
 
 /**
@@ -10,7 +10,7 @@ use extas\interfaces\conditions\IConditionParameter;
  * @package extas\components\conditions
  * @author jeyroik <jeyroik@gmail.com>
  */
-class ConditionParameter extends SampleParameter implements IConditionParameter
+class ConditionParameter extends Param implements IConditionParameter
 {
     use THasCondition;
 

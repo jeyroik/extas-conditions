@@ -38,5 +38,5 @@ interface IExtensionHasCondition
      * @return bool
      * @throws \Exception
      */
-    public function isConditionTrue($compareWith): bool;
+    public function isConditionMet($compareWith): bool;
 }

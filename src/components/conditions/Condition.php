@@ -6,6 +6,7 @@ use extas\components\THasAliases;
 use extas\components\THasClass;
 use extas\components\THasDescription;
 use extas\components\THasName;
+use extas\components\THasStringId;
 use extas\interfaces\conditions\ICondition;
 
 /**
@@ -20,6 +21,7 @@ class Condition extends Item implements ICondition
     use THasDescription;
     use THasClass;
     use THasAliases;
+    use THasStringId;
 
     /**
      * @return string

@@ -1,3 +1,8 @@
+# 2.0.0
+
+- Updated to `extas-foundation` `v6`.
+- Renamed `isConditionTrue` to `isConditionMet`.
+
 # 1.0.0
 
 - Добавлена поддержка динамических репозиториев.

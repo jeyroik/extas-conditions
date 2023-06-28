@@ -23,11 +23,11 @@ class ExtensionHasCondition extends Extension implements IExtensionHasCondition
      * @return bool
      * @throws ExceptionMissedConditionParameter|ExceptionUnknownCondition
      */
-    public function isConditionTrue($compareWith, IItem $item = null): bool
+    public function isConditionMet($compareWith, IItem $item = null): bool
     {
         if (isset($item[IHasCondition::FIELD__CONDITION])) {
             $withConditions = new ConditionParameter($item->__toArray());
-            return $withConditions->isConditionTrue($compareWith);
+            return $withConditions->isConditionMet($compareWith);
         }
 
         throw new ExceptionMissedConditionParameter();
