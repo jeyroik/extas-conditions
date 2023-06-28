@@ -46,8 +46,8 @@ class ConditionAnd extends Plugin implements IConditionDispatcher
     protected function updateResult($result, IHasCondition $sub, $compareWith)
     {
         return is_null($result)
-            ? $sub->isConditionTrue($compareWith)
-            : ($result && $sub->isConditionTrue($compareWith));
+            ? $sub->isConditionMet($compareWith)
+            : ($result && $sub->isConditionMet($compareWith));
     }
 
     /**

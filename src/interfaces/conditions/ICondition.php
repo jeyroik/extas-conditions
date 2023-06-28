@@ -5,6 +5,7 @@ use extas\interfaces\IHasAliases;
 use extas\interfaces\IHasClass;
 use extas\interfaces\IHasDescription;
 use extas\interfaces\IHasName;
+use extas\interfaces\IHaveUUID;
 use extas\interfaces\IItem;
 
 /**
@@ -13,7 +14,7 @@ use extas\interfaces\IItem;
  * @package extas\interfaces\conditions
  * @author jeyroik <jeyroik@gmail.com>
  */
-interface ICondition extends IItem, IHasName, IHasDescription, IHasClass, IHasAliases
+interface ICondition extends IItem, IHasName, IHasDescription, IHasClass, IHasAliases, IHaveUUID
 {
     public const SUBJECT = 'extas.condition';
 }

@@ -35,5 +35,5 @@ interface IHasCondition extends IHasValue
      * @param mixed $compareWith
      * @return bool
      */
-    public function isConditionTrue($compareWith): bool;
+    public function isConditionMet($compareWith): bool;
 }

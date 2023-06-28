@@ -50,7 +50,7 @@ trait THasCondition
      * @return bool
      * @throws ExceptionUnknownCondition
      */
-    public function isConditionTrue($compareWith): bool
+    public function isConditionMet($compareWith): bool
     {
         $condition = $this->getCondition();
 

@@ -1,12 +1,7 @@
 <?php
 namespace tests\conditions;
 
-use Dotenv\Dotenv;
-use extas\components\plugins\TSnuffPlugins;
-use extas\components\repositories\TSnuffRepositoryDynamic;
-use extas\components\THasMagicClass;
 use \PHPUnit\Framework\TestCase;
-use extas\components\plugins\repositories\PluginFieldSelfAlias;
 use extas\components\conditions\ConditionLikeOneIn;
 use extas\components\conditions\ConditionNotLikeOneIn;
 use extas\components\conditions\ConditionNotRegEx;
@@ -44,6 +39,8 @@ use extas\components\conditions\ConditionLowerAlphabet;
 use extas\components\conditions\ConditionLowerOrEqualAlphabet;
 use extas\components\conditions\Condition;
 use extas\components\conditions\ConditionParameter;
+use extas\components\repositories\RepoItem;
+use extas\components\repositories\TSnuffRepository;
 
 /**
  * Class ConditionsTest
@@ -52,32 +49,44 @@ use extas\components\conditions\ConditionParameter;
  */
 class ConditionsTest extends TestCase
 {
-    use TSnuffRepositoryDynamic;
-    use TSnuffPlugins;
-    use THasMagicClass;
+    use TSnuffRepository;
 
     protected function setUp(): void
     {
-        parent::setUp();
-        $env = Dotenv::create(getcwd() . '/tests/');
-        $env->load();
-        $this->createSnuffDynamicRepositories([
-            ['conditions', 'name', Condition::class]
+        putenv("EXTAS__CONTAINER_PATH_STORAGE_LOCK=vendor/jeyroik/extas-foundation/resources/container.dist.json");
+        $this->buildBasicRepos();
+        $this->buildRepo(__DIR__ . '/../../vendor/jeyroik/extas-foundation/resources/', [
+            'conditions' => [
+                "namespace" => "tests\\tmp",
+                "item_class" => "extas\\components\\conditions\\Condition",
+                "pk" => "name",
+                "aliases" => ["conditions"],
+                "hooks" => [],
+                "code" => [
+                    'create-before' => '\\' . RepoItem::class . '::setId($item);'
+                                    .'\\' . RepoItem::class . '::throwIfExist($this, $item, [\'name\']);'
+                                    .'\\' . RepoItem::class . '::addNameToAliases($item);'
+                ]
+            ]
         ]);
     }
 
     public function tearDown(): void
     {
-        $this->unregisterSnuffRepos();
+        $this->dropDatabase(__DIR__);
+        $this->deleteRepo('plugins');
+        $this->deleteRepo('extensions');
+        $this->deleteRepo('conditions');
     }
 
     public function testExtensionHasCondition()
     {
-        $this->createWithSnuffRepo('extensionRepository', new Extension([
+        $cond = new Condition();
+        $cond->extensions()->create(new Extension([
             Extension::FIELD__CLASS => ExtensionHasCondition::class,
             Extension::FIELD__INTERFACE => IExtensionHasCondition::class,
             Extension::FIELD__METHODS => [
-                'isConditionTrue',
+                'isConditionMet',
                 'getConditionName',
                 'getCondition',
                 'setConditionName'
@@ -99,19 +108,20 @@ class ConditionsTest extends TestCase
         };
 
         $this->installCondition('eq', ['='], ConditionEqual::class);
-        $this->assertTrue($test->isConditionTrue(5));
+        $this->assertTrue($test->isConditionMet(5));
         $this->assertEquals('eq', $test->getConditionName());
         $test->setConditionName('=');
         $this->assertEquals('eq', $test->getCondition()->getName());
     }
 
-    public function testExtensionHasConditionFailIsConditionTrue()
+    public function testExtensionHasConditionFailIsConditionMet()
     {
-        $this->createWithSnuffRepo('extensionRepository', new Extension([
+        $cond = new Condition();
+        $cond->extensions()->create(new Extension([
             Extension::FIELD__CLASS => ExtensionHasCondition::class,
             Extension::FIELD__INTERFACE => IExtensionHasCondition::class,
             Extension::FIELD__METHODS => [
-                'isConditionTrue',
+                'isConditionMet',
                 'getConditionName',
                 'getCondition',
                 'setConditionName'
@@ -130,16 +140,17 @@ class ConditionsTest extends TestCase
         };
 
         $this->expectExceptionMessage('Missed ' . IHasCondition::FIELD__CONDITION . ' parameter');
-        $test->isConditionTrue(5);
+        $test->isConditionMet(5);
     }
 
     public function testExtensionHasConditionFailGetConditionName()
     {
-        $this->createWithSnuffRepo('extensionRepository', new Extension([
+        $cond = new Condition();
+        $cond->extensions()->create(new Extension([
             Extension::FIELD__CLASS => ExtensionHasCondition::class,
             Extension::FIELD__INTERFACE => IExtensionHasCondition::class,
             Extension::FIELD__METHODS => [
-                'isConditionTrue',
+                'isConditionMet',
                 'getConditionName',
                 'getCondition',
                 'setConditionName'
@@ -163,11 +174,12 @@ class ConditionsTest extends TestCase
 
     public function testExtensionHasConditionFailGetCondition()
     {
-        $this->createWithSnuffRepo('extensionRepository', new Extension([
+        $cond = new Condition();
+        $cond->extensions()->create(new Extension([
             Extension::FIELD__CLASS => ExtensionHasCondition::class,
             Extension::FIELD__INTERFACE => IExtensionHasCondition::class,
             Extension::FIELD__METHODS => [
-                'isConditionTrue',
+                'isConditionMet',
                 'getConditionName',
                 'getCondition',
                 'setConditionName'
@@ -197,7 +209,7 @@ class ConditionsTest extends TestCase
         ]);
 
         $this->expectExceptionMessage('Unknown condition "unknown"');
-        $hasCondition->isConditionTrue('test');
+        $hasCondition->isConditionMet('test');
     }
 
     public function testRegEx()
@@ -209,11 +221,11 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('regex', ['#'], ConditionRegEx::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('@test me please'));
-        $this->assertFalse($hasCondition->isConditionTrue('tt'));
+        $this->assertTrue($hasCondition->isConditionMet('@test me please'));
+        $this->assertFalse($hasCondition->isConditionMet('tt'));
 
         $hasCondition->setConditionName('regex');
-        $this->assertTrue($hasCondition->isConditionTrue('@test again'));
+        $this->assertTrue($hasCondition->isConditionMet('@test again'));
     }
 
     public function testNotRegEx()
@@ -225,11 +237,11 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('not_regex', ['!#'], ConditionNotRegEx::class);
 
-        $this->assertFalse($hasCondition->isConditionTrue('@test me please'));
-        $this->assertTrue($hasCondition->isConditionTrue('tt'));
+        $this->assertFalse($hasCondition->isConditionMet('@test me please'));
+        $this->assertTrue($hasCondition->isConditionMet('tt'));
 
         $hasCondition->setConditionName('not_regex');
-        $this->assertTrue($hasCondition->isConditionTrue('again'));
+        $this->assertTrue($hasCondition->isConditionMet('again'));
     }
 
     public function testLikeOneIn()
@@ -243,15 +255,15 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('like_one_in', ['~*'], ConditionLikeOneIn::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('test'));
-        $this->assertTrue($hasCondition->isConditionTrue(55));
-        $this->assertFalse($hasCondition->isConditionTrue(7));
+        $this->assertTrue($hasCondition->isConditionMet('test'));
+        $this->assertTrue($hasCondition->isConditionMet(55));
+        $this->assertFalse($hasCondition->isConditionMet(7));
 
         $hasCondition->setValue('test');
-        $this->assertTrue($hasCondition->isConditionTrue('tester'));
+        $this->assertTrue($hasCondition->isConditionMet('tester'));
 
         $hasCondition->setConditionName('like_one_in');
-        $this->assertTrue($hasCondition->isConditionTrue('test'));
+        $this->assertTrue($hasCondition->isConditionMet('test'));
     }
 
     public function testNotLikeOneIn()
@@ -265,15 +277,15 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('not_like_one_in', ['!~*'], ConditionNotLikeOneIn::class);
 
-        $this->assertFalse($hasCondition->isConditionTrue('test'));
-        $this->assertFalse($hasCondition->isConditionTrue(55));
-        $this->assertTrue($hasCondition->isConditionTrue(7));
+        $this->assertFalse($hasCondition->isConditionMet('test'));
+        $this->assertFalse($hasCondition->isConditionMet(55));
+        $this->assertTrue($hasCondition->isConditionMet(7));
 
         $hasCondition->setValue('test');
-        $this->assertFalse($hasCondition->isConditionTrue('tester'));
+        $this->assertFalse($hasCondition->isConditionMet('tester'));
 
         $hasCondition->setConditionName('not_like_one_in');
-        $this->assertFalse($hasCondition->isConditionTrue('test'));
+        $this->assertFalse($hasCondition->isConditionMet('test'));
     }
 
     public function testLike()
@@ -285,14 +297,14 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('like', ['~'], ConditionLike::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('test'));
-        $this->assertFalse($hasCondition->isConditionTrue('tt'));
+        $this->assertTrue($hasCondition->isConditionMet('test'));
+        $this->assertFalse($hasCondition->isConditionMet('tt'));
 
         $hasCondition->setValue(5);
-        $this->assertTrue($hasCondition->isConditionTrue(50));
+        $this->assertTrue($hasCondition->isConditionMet(50));
 
         $hasCondition->setConditionName('like');
-        $this->assertTrue($hasCondition->isConditionTrue(105));
+        $this->assertTrue($hasCondition->isConditionMet(105));
     }
 
     public function testNotLike()
@@ -304,14 +316,14 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('not_like', ['!~'], ConditionNotLike::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('tt'));
-        $this->assertFalse($hasCondition->isConditionTrue('test'));
+        $this->assertTrue($hasCondition->isConditionMet('tt'));
+        $this->assertFalse($hasCondition->isConditionMet('test'));
 
         $hasCondition->setValue(5);
-        $this->assertTrue($hasCondition->isConditionTrue(60));
+        $this->assertTrue($hasCondition->isConditionMet(60));
 
         $hasCondition->setConditionName('not_like');
-        $this->assertTrue($hasCondition->isConditionTrue(100));
+        $this->assertTrue($hasCondition->isConditionMet(100));
     }
 
     public function testEmpty()
@@ -323,14 +335,14 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('empty', ['null', '@'], ConditionEmpty::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue(null));
-        $this->assertFalse($hasCondition->isConditionTrue(''));
-        $this->assertFalse($hasCondition->isConditionTrue(0));
-        $this->assertFalse($hasCondition->isConditionTrue(false));
-        $this->assertFalse($hasCondition->isConditionTrue(6));
+        $this->assertTrue($hasCondition->isConditionMet(null));
+        $this->assertFalse($hasCondition->isConditionMet(''));
+        $this->assertFalse($hasCondition->isConditionMet(0));
+        $this->assertFalse($hasCondition->isConditionMet(false));
+        $this->assertFalse($hasCondition->isConditionMet(6));
 
         $hasCondition->setConditionName('empty');
-        $this->assertTrue($hasCondition->isConditionTrue(null));
+        $this->assertTrue($hasCondition->isConditionMet(null));
     }
 
     public function testNotEmpty()
@@ -342,14 +354,14 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('not_empty', ['!null', '!@'], ConditionNotEmpty::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue(6));
-        $this->assertTrue($hasCondition->isConditionTrue(''));
-        $this->assertTrue($hasCondition->isConditionTrue(0));
-        $this->assertTrue($hasCondition->isConditionTrue(false));
-        $this->assertFalse($hasCondition->isConditionTrue(null));
+        $this->assertTrue($hasCondition->isConditionMet(6));
+        $this->assertTrue($hasCondition->isConditionMet(''));
+        $this->assertTrue($hasCondition->isConditionMet(0));
+        $this->assertTrue($hasCondition->isConditionMet(false));
+        $this->assertFalse($hasCondition->isConditionMet(null));
 
         $hasCondition->setConditionName('not_empty');
-        $this->assertTrue($hasCondition->isConditionTrue(true));
+        $this->assertTrue($hasCondition->isConditionMet(true));
     }
 
     public function testAnd()
@@ -372,16 +384,16 @@ class ConditionsTest extends TestCase
         $this->installCondition('greater', ['>'], ConditionGreater::class);
         $this->installCondition('lower', ['<'], ConditionLower::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('6'));
-        $this->assertTrue($hasCondition->isConditionTrue(7));
-        $this->assertFalse($hasCondition->isConditionTrue(5));
+        $this->assertTrue($hasCondition->isConditionMet('6'));
+        $this->assertTrue($hasCondition->isConditionMet(7));
+        $this->assertFalse($hasCondition->isConditionMet(5));
 
         $hasCondition->setConditionName('and');
-        $this->assertTrue($hasCondition->isConditionTrue(8));
+        $this->assertTrue($hasCondition->isConditionMet(8));
 
         $hasCondition->setValue('not array');
         $this->expectExceptionMessage('Need array as argument in a condition');
-        $hasCondition->isConditionTrue(8);
+        $hasCondition->isConditionMet(8);
     }
 
     public function testOr()
@@ -404,16 +416,16 @@ class ConditionsTest extends TestCase
         $this->installCondition('greater', ['>'], ConditionGreater::class);
         $this->installCondition('lower', ['<'], ConditionLower::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('6'));
-        $this->assertTrue($hasCondition->isConditionTrue(4));
-        $this->assertTrue($hasCondition->isConditionTrue(11));
+        $this->assertTrue($hasCondition->isConditionMet('6'));
+        $this->assertTrue($hasCondition->isConditionMet(4));
+        $this->assertTrue($hasCondition->isConditionMet(11));
 
         $hasCondition->setConditionName('or');
-        $this->assertTrue($hasCondition->isConditionTrue(8));
+        $this->assertTrue($hasCondition->isConditionMet(8));
 
         $hasCondition->setValue('not array');
         $this->expectExceptionMessage('Need array as argument in a condition');
-        $hasCondition->isConditionTrue(8);
+        $hasCondition->isConditionMet(8);
     }
 
     public function testIn()
@@ -427,17 +439,17 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('in', ['*'], ConditionIn::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('test'));
-        $this->assertTrue($hasCondition->isConditionTrue(5));
-        $this->assertTrue($hasCondition->isConditionTrue(['test']));
-        $this->assertTrue($hasCondition->isConditionTrue([5, 'test']));
-        $this->assertFalse($hasCondition->isConditionTrue(7));
+        $this->assertTrue($hasCondition->isConditionMet('test'));
+        $this->assertTrue($hasCondition->isConditionMet(5));
+        $this->assertTrue($hasCondition->isConditionMet(['test']));
+        $this->assertTrue($hasCondition->isConditionMet([5, 'test']));
+        $this->assertFalse($hasCondition->isConditionMet(7));
 
         $hasCondition->setValue('test');
-        $this->assertTrue($hasCondition->isConditionTrue('test'));
+        $this->assertTrue($hasCondition->isConditionMet('test'));
 
         $hasCondition->setConditionName('in');
-        $this->assertTrue($hasCondition->isConditionTrue('test'));
+        $this->assertTrue($hasCondition->isConditionMet('test'));
     }
 
     public function testNotIn()
@@ -451,17 +463,17 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('not_in', ['!*'], ConditionNotIn::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('test1'));
-        $this->assertTrue($hasCondition->isConditionTrue(50));
-        $this->assertTrue($hasCondition->isConditionTrue(['test1']));
-        $this->assertTrue($hasCondition->isConditionTrue([50, 'test1']));
-        $this->assertTrue($hasCondition->isConditionTrue(7));
+        $this->assertTrue($hasCondition->isConditionMet('test1'));
+        $this->assertTrue($hasCondition->isConditionMet(50));
+        $this->assertTrue($hasCondition->isConditionMet(['test1']));
+        $this->assertTrue($hasCondition->isConditionMet([50, 'test1']));
+        $this->assertTrue($hasCondition->isConditionMet(7));
 
         $hasCondition->setValue('test1');
-        $this->assertTrue($hasCondition->isConditionTrue('test'));
+        $this->assertTrue($hasCondition->isConditionMet('test'));
 
         $hasCondition->setConditionName('not_in');
-        $this->assertTrue($hasCondition->isConditionTrue('test'));
+        $this->assertTrue($hasCondition->isConditionMet('test'));
     }
 
     public function testEqual()
@@ -473,12 +485,12 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('equal', ['='], ConditionEqual::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue(5));
-        $this->assertTrue($hasCondition->isConditionTrue('5'));
-        $this->assertFalse($hasCondition->isConditionTrue(6));
+        $this->assertTrue($hasCondition->isConditionMet(5));
+        $this->assertTrue($hasCondition->isConditionMet('5'));
+        $this->assertFalse($hasCondition->isConditionMet(6));
 
         $hasCondition->setConditionName('equal');
-        $this->assertTrue($hasCondition->isConditionTrue(5));
+        $this->assertTrue($hasCondition->isConditionMet(5));
     }
 
     public function testEqualLength()
@@ -490,14 +502,14 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('equal_length', ['l='], ConditionEqualLength::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('fghij'));
-        $this->assertFalse($hasCondition->isConditionTrue('abc'));
+        $this->assertTrue($hasCondition->isConditionMet('fghij'));
+        $this->assertFalse($hasCondition->isConditionMet('abc'));
 
         $hasCondition->setValue(50);
-        $this->assertTrue($hasCondition->isConditionTrue(70));
+        $this->assertTrue($hasCondition->isConditionMet(70));
 
         $hasCondition->setConditionName('equal_length');
-        $this->assertTrue($hasCondition->isConditionTrue('ab'));
+        $this->assertTrue($hasCondition->isConditionMet('ab'));
     }
 
     public function testEqualAlphabet()
@@ -509,14 +521,14 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('equal_alphabet', ['a='], ConditionEqualAlphabet::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('abc'));
-        $this->assertFalse($hasCondition->isConditionTrue('acb'));
+        $this->assertTrue($hasCondition->isConditionMet('abc'));
+        $this->assertFalse($hasCondition->isConditionMet('acb'));
 
         $hasCondition->setValue(50);
-        $this->assertTrue($hasCondition->isConditionTrue(50));
+        $this->assertTrue($hasCondition->isConditionMet(50));
 
         $hasCondition->setConditionName('equal_alphabet');
-        $this->assertTrue($hasCondition->isConditionTrue(50));
+        $this->assertTrue($hasCondition->isConditionMet(50));
     }
 
     public function testNotEqual()
@@ -528,12 +540,12 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('not_equal', ['!='], ConditionNotEqual::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue(6));
-        $this->assertTrue($hasCondition->isConditionTrue('6'));
-        $this->assertFalse($hasCondition->isConditionTrue(5));
+        $this->assertTrue($hasCondition->isConditionMet(6));
+        $this->assertTrue($hasCondition->isConditionMet('6'));
+        $this->assertFalse($hasCondition->isConditionMet(5));
 
         $hasCondition->setConditionName('not_equal');
-        $this->assertTrue($hasCondition->isConditionTrue(6));
+        $this->assertTrue($hasCondition->isConditionMet(6));
     }
 
     public function testNotEqualLength()
@@ -545,14 +557,14 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('not_equal_length', ['l!='], ConditionNotEqualLength::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('abcdef'));
-        $this->assertFalse($hasCondition->isConditionTrue('fghij'));
+        $this->assertTrue($hasCondition->isConditionMet('abcdef'));
+        $this->assertFalse($hasCondition->isConditionMet('fghij'));
 
         $hasCondition->setValue(50);
-        $this->assertTrue($hasCondition->isConditionTrue(500));
+        $this->assertTrue($hasCondition->isConditionMet(500));
 
         $hasCondition->setConditionName('not_equal_length');
-        $this->assertTrue($hasCondition->isConditionTrue('test'));
+        $this->assertTrue($hasCondition->isConditionMet('test'));
     }
 
     public function testNotEqualAlphabet()
@@ -564,14 +576,14 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('not_equal_alphabet', ['a!='], ConditionNotEqualAlphabet::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('bac'));
-        $this->assertFalse($hasCondition->isConditionTrue('abc'));
+        $this->assertTrue($hasCondition->isConditionMet('bac'));
+        $this->assertFalse($hasCondition->isConditionMet('abc'));
 
         $hasCondition->setValue(50);
-        $this->assertTrue($hasCondition->isConditionTrue(51));
+        $this->assertTrue($hasCondition->isConditionMet(51));
 
         $hasCondition->setConditionName('not_equal_alphabet');
-        $this->assertTrue($hasCondition->isConditionTrue('cab'));
+        $this->assertTrue($hasCondition->isConditionMet('cab'));
     }
 
     public function testGreater()
@@ -583,12 +595,12 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('greater', ['>'], ConditionGreater::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue(6));
-        $this->assertTrue($hasCondition->isConditionTrue('50'));
-        $this->assertFalse($hasCondition->isConditionTrue(5));
+        $this->assertTrue($hasCondition->isConditionMet(6));
+        $this->assertTrue($hasCondition->isConditionMet('50'));
+        $this->assertFalse($hasCondition->isConditionMet(5));
 
         $hasCondition->setConditionName('greater');
-        $this->assertTrue($hasCondition->isConditionTrue(50));
+        $this->assertTrue($hasCondition->isConditionMet(50));
     }
 
     public function testGreaterLength()
@@ -600,14 +612,14 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('greater_length', ['l>'], ConditionGreaterLength::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('abcd'));
-        $this->assertFalse($hasCondition->isConditionTrue('ab'));
+        $this->assertTrue($hasCondition->isConditionMet('abcd'));
+        $this->assertFalse($hasCondition->isConditionMet('ab'));
 
         $hasCondition->setValue(50);
-        $this->assertTrue($hasCondition->isConditionTrue(0.001));
+        $this->assertTrue($hasCondition->isConditionMet(0.001));
 
         $hasCondition->setConditionName('greater_length');
-        $this->assertTrue($hasCondition->isConditionTrue('test'));
+        $this->assertTrue($hasCondition->isConditionMet('test'));
     }
 
     public function testGreaterAlphabet()
@@ -619,14 +631,14 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('greater_alphabet', ['a>'], ConditionGreaterAlphabet::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('bbc'));
-        $this->assertFalse($hasCondition->isConditionTrue('aab'));
+        $this->assertTrue($hasCondition->isConditionMet('bbc'));
+        $this->assertFalse($hasCondition->isConditionMet('aab'));
 
         $hasCondition->setValue(50);
-        $this->assertTrue($hasCondition->isConditionTrue(60));
+        $this->assertTrue($hasCondition->isConditionMet(60));
 
         $hasCondition->setConditionName('greater_alphabet');
-        $this->assertTrue($hasCondition->isConditionTrue(51));
+        $this->assertTrue($hasCondition->isConditionMet(51));
     }
 
     public function testGreaterOrEqual()
@@ -638,12 +650,12 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('greater_or_equal', ['>='], ConditionGreaterOrEqual::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue(6));
-        $this->assertTrue($hasCondition->isConditionTrue('5'));
-        $this->assertFalse($hasCondition->isConditionTrue(4));
+        $this->assertTrue($hasCondition->isConditionMet(6));
+        $this->assertTrue($hasCondition->isConditionMet('5'));
+        $this->assertFalse($hasCondition->isConditionMet(4));
 
         $hasCondition->setConditionName('greater_or_equal');
-        $this->assertTrue($hasCondition->isConditionTrue(50));
+        $this->assertTrue($hasCondition->isConditionMet(50));
     }
 
     public function testGreaterOrEqualLength()
@@ -655,15 +667,15 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('greater_or_equal_length', ['l>='], ConditionGreaterOrEqualLength::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('abc'));
-        $this->assertTrue($hasCondition->isConditionTrue('abcd'));
-        $this->assertFalse($hasCondition->isConditionTrue('ab'));
+        $this->assertTrue($hasCondition->isConditionMet('abc'));
+        $this->assertTrue($hasCondition->isConditionMet('abcd'));
+        $this->assertFalse($hasCondition->isConditionMet('ab'));
 
         $hasCondition->setValue(50);
-        $this->assertTrue($hasCondition->isConditionTrue(0.001));
+        $this->assertTrue($hasCondition->isConditionMet(0.001));
 
         $hasCondition->setConditionName('greater_or_equal_length');
-        $this->assertTrue($hasCondition->isConditionTrue(500));
+        $this->assertTrue($hasCondition->isConditionMet(500));
     }
 
     public function testGreaterOrEqualAlphabet()
@@ -679,15 +691,15 @@ class ConditionsTest extends TestCase
             ConditionGreaterOrEqualAlphabet::class
         );
 
-        $this->assertTrue($hasCondition->isConditionTrue('bbc'));
-        $this->assertTrue($hasCondition->isConditionTrue('abc'));
-        $this->assertFalse($hasCondition->isConditionTrue('aab'));
+        $this->assertTrue($hasCondition->isConditionMet('bbc'));
+        $this->assertTrue($hasCondition->isConditionMet('abc'));
+        $this->assertFalse($hasCondition->isConditionMet('aab'));
 
         $hasCondition->setValue(50);
-        $this->assertTrue($hasCondition->isConditionTrue(60));
+        $this->assertTrue($hasCondition->isConditionMet(60));
 
         $hasCondition->setConditionName('greater_or_equal_alphabet');
-        $this->assertTrue($hasCondition->isConditionTrue(50));
+        $this->assertTrue($hasCondition->isConditionMet(50));
     }
 
     public function testLower()
@@ -699,12 +711,12 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('lower', ['<'], ConditionLower::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue(4));
-        $this->assertTrue($hasCondition->isConditionTrue('3'));
-        $this->assertFalse($hasCondition->isConditionTrue(5));
+        $this->assertTrue($hasCondition->isConditionMet(4));
+        $this->assertTrue($hasCondition->isConditionMet('3'));
+        $this->assertFalse($hasCondition->isConditionMet(5));
 
         $hasCondition->setConditionName('lower');
-        $this->assertTrue($hasCondition->isConditionTrue(1));
+        $this->assertTrue($hasCondition->isConditionMet(1));
     }
 
     public function testLowerLength()
@@ -716,14 +728,14 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('lower_length', ['l<'], ConditionLowerLength::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('ab'));
-        $this->assertFalse($hasCondition->isConditionTrue('abc'));
+        $this->assertTrue($hasCondition->isConditionMet('ab'));
+        $this->assertFalse($hasCondition->isConditionMet('abc'));
 
         $hasCondition->setValue(50);
-        $this->assertTrue($hasCondition->isConditionTrue(9));
+        $this->assertTrue($hasCondition->isConditionMet(9));
 
         $hasCondition->setConditionName('lower_length');
-        $this->assertTrue($hasCondition->isConditionTrue(5));
+        $this->assertTrue($hasCondition->isConditionMet(5));
     }
 
     public function testLowerAlphabet()
@@ -735,14 +747,14 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('lower_alphabet', ['a<'], ConditionLowerAlphabet::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('aac'));
-        $this->assertFalse($hasCondition->isConditionTrue('bbc'));
+        $this->assertTrue($hasCondition->isConditionMet('aac'));
+        $this->assertFalse($hasCondition->isConditionMet('bbc'));
 
         $hasCondition->setValue(50);
-        $this->assertTrue($hasCondition->isConditionTrue(40));
+        $this->assertTrue($hasCondition->isConditionMet(40));
 
         $hasCondition->setConditionName('lower_alphabet');
-        $this->assertTrue($hasCondition->isConditionTrue(400));
+        $this->assertTrue($hasCondition->isConditionMet(400));
     }
 
     public function testLowerOrEqual()
@@ -754,12 +766,12 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('lower_or_equal', ['<='], ConditionLowerOrEqual::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue(4));
-        $this->assertTrue($hasCondition->isConditionTrue('5'));
-        $this->assertFalse($hasCondition->isConditionTrue(6));
+        $this->assertTrue($hasCondition->isConditionMet(4));
+        $this->assertTrue($hasCondition->isConditionMet('5'));
+        $this->assertFalse($hasCondition->isConditionMet(6));
 
         $hasCondition->setConditionName('lower_or_equal');
-        $this->assertTrue($hasCondition->isConditionTrue(1));
+        $this->assertTrue($hasCondition->isConditionMet(1));
     }
 
     public function testLowerOrEqualLength()
@@ -771,15 +783,15 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('lower_or_equal_length', ['l<='], ConditionLowerOrEqualLength::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('ab'));
-        $this->assertTrue($hasCondition->isConditionTrue('abr'));
-        $this->assertFalse($hasCondition->isConditionTrue('test'));
+        $this->assertTrue($hasCondition->isConditionMet('ab'));
+        $this->assertTrue($hasCondition->isConditionMet('abr'));
+        $this->assertFalse($hasCondition->isConditionMet('test'));
 
         $hasCondition->setValue(50);
-        $this->assertTrue($hasCondition->isConditionTrue(50));
+        $this->assertTrue($hasCondition->isConditionMet(50));
 
         $hasCondition->setConditionName('lower_or_equal_length');
-        $this->assertTrue($hasCondition->isConditionTrue(5));
+        $this->assertTrue($hasCondition->isConditionMet(5));
     }
 
     public function testLowerOrEqualAlphabet()
@@ -791,15 +803,16 @@ class ConditionsTest extends TestCase
 
         $this->installCondition('lower_or_equal_alphabet', ['a<='], ConditionLowerOrEqualAlphabet::class);
 
-        $this->assertTrue($hasCondition->isConditionTrue('aac'));
-        $this->assertTrue($hasCondition->isConditionTrue('abc'));
-        $this->assertFalse($hasCondition->isConditionTrue('bbc'));
+        $this->assertTrue($hasCondition->isConditionMet('aac'));
+
+        $this->assertTrue($hasCondition->isConditionMet('abc'));
+        $this->assertFalse($hasCondition->isConditionMet('bbc'));
 
         $hasCondition->setValue(50);
-        $this->assertTrue($hasCondition->isConditionTrue(40));
+        $this->assertTrue($hasCondition->isConditionMet(40));
 
         $hasCondition->setConditionName('lower_or_equal_alphabet');
-        $this->assertTrue($hasCondition->isConditionTrue(400));
+        $this->assertTrue($hasCondition->isConditionMet(400));
     }
 
     /**
@@ -809,8 +822,8 @@ class ConditionsTest extends TestCase
      */
     protected function installCondition(string $name, array $aliases, string $class)
     {
-        $this->createSnuffPlugin(PluginFieldSelfAlias::class, ['extas.conditions.create.before']);
-        $this->getMagicClass('conditions')->create(new Condition([
+        $cond = new Condition();
+        $cond->conditions()->create(new Condition([
             Condition::FIELD__NAME => $name,
             Condition::FIELD__ALIASES => $aliases,
             Condition::FIELD__CLASS => $class,

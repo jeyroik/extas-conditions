@@ -1,7 +1,7 @@
 <?php
 namespace extas\interfaces\conditions;
 
-use extas\interfaces\samples\parameters\ISampleParameter;
+use extas\interfaces\parameters\IParam;
 
 /**
  * Interface IConditionParameter
@@ -9,7 +9,7 @@ use extas\interfaces\samples\parameters\ISampleParameter;
  * @package extas\interfaces\conditions
  * @author jeyroik <jeyroik@gmail.com>
  */
-interface IConditionParameter extends ISampleParameter, IHasCondition
+interface IConditionParameter extends IParam, IHasCondition
 {
 
 }

@@ -1,239 +1,215 @@
 {
   "name": "extas/conditions",
-  "installer_version": 3,
-  "repositories": [
-    {
-      "name": "conditions",
-      "scope": "extas",
-      "pk": "name",
-      "class": "extas\\components\\conditions\\Condition",
-      "aliases": ["conditions", "conditionRepository"]
-    }
-  ],
-  "plugins_install": [
-    {
-      "repository": "conditions",
-      "name": "condition",
-      "section": "conditions"
-    }
-  ],
-  "plugins": [
-    {
-      "class": "extas\\components\\plugins\\repositories\\PluginFieldSelfAlias",
-      "stage": "extas.conditions.create.before",
-      "install_on": "initialization"
-    }
-  ],
   "conditions": [
     {
       "name": "and",
       "title": "And",
       "description": "Logical multiplication",
       "class": "extas\\components\\conditions\\ConditionAnd",
-      "aliases": ["&", "&&", "and"]
+      "aliases": ["&", "&&"]
     },
     {
       "name": "empty",
       "title": "Empty value",
       "description": "Is empty value",
       "class": "extas\\components\\conditions\\ConditionEmpty",
-      "aliases": ["empty", "@", "null"]
+      "aliases": ["@", "null"]
     },
     {
       "name": "equal",
       "title": "Arithmetic equal",
       "description": "Arithmetic equal compare",
       "class": "extas\\components\\conditions\\ConditionEqual",
-      "aliases": ["=", "eq", "equal"]
+      "aliases": ["=", "eq"]
     },
     {
       "name": "equal_alphabet",
       "title": "Alphabet equal",
       "description": "Alphabet equal compare",
       "class": "extas\\components\\conditions\\ConditionEqualAlphabet",
-      "aliases": ["a=", "aeq", "aequal", "equal_alphabet"]
+      "aliases": ["a=", "aeq", "aequal"]
     },
     {
       "name": "equal_length",
       "title": "Equal by length",
       "description": "By length equal compare",
       "class": "extas\\components\\conditions\\ConditionEqualLength",
-      "aliases": ["l=", "leq", "lequal", "equal_length"]
+      "aliases": ["l=", "leq", "lequal"]
     },
     {
       "name": "greater",
       "title": "Arithmetic greater",
       "description": "Arithmetic greater compare",
       "class": "extas\\components\\conditions\\ConditionGreater",
-      "aliases": [">", "gt", "greater"]
+      "aliases": [">", "gt"]
     },
     {
       "name": "greater_alphabet",
       "title": "Alphabet greater",
       "description": "Alphabet greater compare",
       "class": "extas\\components\\conditions\\ConditionGreaterAlphabet",
-      "aliases": ["a>", "agt", "agreater", "greater_alphabet"]
+      "aliases": ["a>", "agt", "agreater"]
     },
     {
       "name": "greater_length",
       "title": "Greater by length",
       "description": "By length greater compare",
       "class": "extas\\components\\conditions\\ConditionGreaterLength",
-      "aliases": ["l>", "lgt", "lgreater", "greater_length"]
+      "aliases": ["l>", "lgt", "lgreater"]
     },
     {
       "name": "greater_or_equal",
       "title": "Arithmetic greater or equal",
       "description": "Arithmetic greater or equal compare",
       "class": "extas\\components\\conditions\\ConditionGreaterOrEqual",
-      "aliases": [">=", "gte", "gteq", "greater_or_equal"]
+      "aliases": [">=", "gte", "gteq"]
     },
     {
       "name": "greater_or_equal_alphabet",
       "title": "Alphabet greater or equal",
       "description": "Alphabet greater or equal compare",
       "class": "extas\\components\\conditions\\ConditionGreaterOrEqualAlphabet",
-      "aliases": ["a>=", "agte", "agteq", "agreater_or_equal", "greater_or_equal_alphabet"]
+      "aliases": ["a>=", "agte", "agteq", "agreater_or_equal"]
     },
     {
       "name": "greater_or_equal_length",
       "title": "Greater or equal by length",
       "description": "By length greater or equal compare",
       "class": "extas\\components\\conditions\\ConditionGreaterOrEqualLength",
-      "aliases": ["l>=", "lgte", "lgteq", "lgreater_or_equal", "greater_or_equal_length"]
+      "aliases": ["l>=", "lgte", "lgteq", "lgreater_or_equal"]
     },
     {
       "name": "in",
       "title": "One of (IN)",
       "description": "One of a list",
       "class": "extas\\components\\conditions\\ConditionIn",
-      "aliases": ["*", "in"]
+      "aliases": ["*"]
     },
     {
       "name": "like",
       "title": "Like",
       "description": "Like",
       "class": "extas\\components\\conditions\\ConditionLike",
-      "aliases": ["~", "like"]
+      "aliases": ["~"]
     },
     {
       "name": "like_on_in",
       "title": "Like one of (IN)",
       "description": "Like one of a list",
       "class": "extas\\components\\conditions\\ConditionLikeOneIn",
-      "aliases": ["~*", "like_on_in", "like_in"]
+      "aliases": ["~*", "like_in"]
     },
     {
       "name": "lower",
       "title": "Arithmetic lower",
       "description": "Arithmetic lower compare",
       "class": "extas\\components\\conditions\\ConditionLower",
-      "aliases": ["<", "lt", "lower"]
+      "aliases": ["<", "lt"]
     },
     {
       "name": "lower_alphabet",
       "title": "Alphabet lower",
       "description": "Alphabet lower compare",
       "class": "extas\\components\\conditions\\ConditionLowerAlphabet",
-      "aliases": ["a<", "alt", "alower", "lower_alphabet"]
+      "aliases": ["a<", "alt", "alower"]
     },
     {
       "name": "lower_length",
       "title": "Lower by length",
       "description": "By length lower compare",
       "class": "extas\\components\\conditions\\ConditionLowerLength",
-      "aliases": ["l<", "llt", "llower", "lower_length"]
+      "aliases": ["l<", "llt", "llower"]
     },
     {
       "name": "lower_or_equal",
       "title": "Arithmetic lower or equal",
       "description": "Arithmetic lower or equal compare",
       "class": "extas\\components\\conditions\\ConditionLowerOrEqual",
-      "aliases": ["<=", "lte", "lower_or_equal"]
+      "aliases": ["<=", "lte"]
     },
     {
       "name": "lower_or_equal_alphabet",
       "title": "Alphabet lower or equal",
       "description": "Alphabet lower or equal compare",
       "class": "extas\\components\\conditions\\ConditionLowerOrEqualAlphabet",
-      "aliases": ["a<=", "alte", "alower_or_equal", "lower_or_equal_alphabet"]
+      "aliases": ["a<=", "alte", "alower_or_equal"]
     },
     {
       "name": "lower_or_equal_length",
       "title": "Lower or equal by length",
       "description": "By length lower or equal compare",
       "class": "extas\\components\\conditions\\ConditionLowerOrEqualLength",
-      "aliases": ["l<=", "llte", "llower_or_equal", "lower_or_equal_length"]
+      "aliases": ["l<=", "llte", "llower_or_equal"]
     },
     {
       "name": "not_empty",
       "title": "Not empty",
       "description": "Not empty value",
       "class": "extas\\components\\conditions\\ConditionNotEmpty",
-      "aliases": ["!null", "!@", "!empty", "not_empty"]
+      "aliases": ["!null", "!@", "!empty"]
     },
     {
       "name": "not_equal",
       "title": "Not equal",
       "description": "Arithmetic not equal compare",
       "class": "extas\\components\\conditions\\ConditionNotEqual",
-      "aliases": ["!=", "!eq", "!equal", "not_equal"]
+      "aliases": ["!=", "!eq", "!equal"]
     },
     {
       "name": "not_equal_alphabet",
       "title": "Not equal by alphabet",
       "description": "Alphabet not equal compare",
       "class": "extas\\components\\conditions\\ConditionNotEqualAlphabet",
-      "aliases": ["a!=", "a!eq", "a!equal", "anot_equal", "not_equal_alphabet"]
+      "aliases": ["a!=", "a!eq", "a!equal", "anot_equal"]
     },
     {
       "name": "not_equal_length",
       "title": "Not equal by length",
       "description": "By length not equal compare",
       "class": "extas\\components\\conditions\\ConditionNotEqualLength",
-      "aliases": ["l!=", "l!eq", "l!equal", "lnot_equal", "not_equal_length"]
+      "aliases": ["l!=", "l!eq", "l!equal", "lnot_equal"]
     },
     {
       "name": "not_in",
       "title": "Not in",
       "description": "Not one of a list",
       "class": "extas\\components\\conditions\\ConditionNotIn",
-      "aliases": ["!*", "nin", "!in", "not_in"]
+      "aliases": ["!*", "nin", "!in"]
     },
     {
       "name": "not_like",
       "title": "Not like",
       "description": "Not like",
       "class": "extas\\components\\conditions\\ConditionNotLike",
-      "aliases": ["!~", "nlike", "!like", "not_like"]
+      "aliases": ["!~", "nlike", "!like"]
     },
     {
       "name": "not_like_one_in",
       "title": "Not like one in",
       "description": "Not like one of a list",
       "class": "extas\\components\\conditions\\ConditionNotLikeOneIn",
-      "aliases": ["!~*", "nlike_one_in", "!like_one_in", "not_like_one_in", "not_like_in"]
+      "aliases": ["!~*", "nlike_one_in", "!like_one_in", "not_like_in"]
     },
     {
       "name": "not_regex",
       "title": "Not regex",
       "description": "Not as regular expression",
       "class": "extas\\components\\conditions\\ConditionNotRegEx",
-      "aliases": ["!#", "!regexp", "!regex", "not_regexp", "not_regex"]
+      "aliases": ["!#", "!regexp", "!regex", "not_regexp"]
     },
     {
       "name": "or",
       "title": "Or",
       "description": "Logical addition",
       "class": "extas\\components\\conditions\\ConditionOr",
-      "aliases": ["|", "||", "or"]
+      "aliases": ["|", "||"]
     },
     {
       "name": "regex",
       "title": "RegEx",
       "description": "Regular expression",
       "class": "extas\\components\\conditions\\ConditionRegEx",
-      "aliases": ["#", "regexp", "regex"]
+      "aliases": ["#", "regexp"]
     }
   ]
 }
